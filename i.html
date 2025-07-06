@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام حجز طلاب البرمجة - النسخة الآمنة</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #3498db;
+            --secondary: #2c3e50;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2980, #26d0ce);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--light);
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 30px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        .form-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section-title i {
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+        
+        .gender-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .gender-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .gender-option.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .gender-option input {
+            width: auto;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            background: rgba(52, 152, 219, 0.3);
+            font-weight: 600;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            background: var(--success);
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(120%);
+            transition: transform 0.4s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.error {
+            background: var(--danger);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* زر المطور السري */
+        .dev-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 5px;
+            height: 5px;
+            background: var(--danger);
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            z-index: 9999;
+            opacity: 0.01;
+            transition: all 0.3s ease;
+        }
+        
+        .dev-btn:hover {
+            opacity: 1;
+            width: 40px;
+            height: 40px;
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.7);
+        }
+        
+        /* صفحة كلمة المرور */
+        .password-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+        }
+        
+        .password-page.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .password-box {
+            background: linear-gradient(135deg, #2c3e50, #1a1a2e);
+            width: 90%;
+            max-width: 500px;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            position: relative;
+        }
+        
+        .password-box h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .password-box p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
+        
+        .password-input {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .password-input input {
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            text-align: center;
+            letter-spacing: 3px;
+        }
+        
+        .password-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .password-actions .btn {
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .lock-icon {
+            font-size: 5rem;
+            color: var(--warning);
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* صفحة عرض الطلاب */
+        .students-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            z-index: 9000;
+            padding: 20px;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.5s ease;
+        }
+        
+        .students-page.active {
+            transform: translateY(0);
+        }
+        
+        .students-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .students-header h2 {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .students-header h2 i {
+            color: var(--primary);
+        }
+        
+        .secure-badge {
+            background: var(--success);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                gap: 20px;
+            }
+            
+            .form-section {
+                padding: 20px 15px;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .gender-group {
+                flex-direction: column;
+            }
+            
+            .actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .password-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- زر المطور المخفي -->
+    <button class="dev-btn" id="devButton" title="منطقة المطور"></button>
+    
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-laptop-code"></i> نظام حجز طلاب البرمجة</h1>
+            <p>أدخل بيانات الطلاب وعرضها في مكان واحد آمن</p>
+        </header>
+        
+        <div class="app-container">
+            <section class="form-section">
+                <h2 class="section-title"><i class="fas fa-user-plus"></i> إضافة طالب جديد</h2>
+                
+                <div class="form-group">
+                    <label for="firstName">الاسم الأول</label>
+                    <input type="text" id="firstName" placeholder="أدخل الاسم الأول">
+                </div>
+                
+                <div class="form-group">
+                    <label for="lastName">اللقب</label>
+                    <input type="text" id="lastName" placeholder="أدخل اللقب">
+                </div>
+              
+                
+                <div class="form-group">
+                    <label for="age">العمر</label>
+                    <input type="number" id="age" placeholder="أدخل العمر" min="10" max="60">
+                </div>
+                
+                <div class="form-group">
+                    <label>الجنس</label>
+                    <div class="gender-group">
+                        <div class="gender-option" onclick="selectGender('male')">
+                            <input type="radio" name="gender" id="male" value="male">
+                            <label for="male" style="display: inline; margin: 0;">ذكر</label>
+                        </div>
+                        <div class="gender-option" onclick="selectGender('female')">
+                            <input type="radio" name="gender" id="female" value="female">
+                            <label for="female" style="display: inline; margin: 0;">أنثى</label>
+                        </div>
+                       
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn btn-primary" onclick="addStudent()">
+                        <i class="fas fa-plus"></i> إضافة طالب
+                    </button>
+                    <button class="btn btn-danger" onclick="clearForm()">
+                        <i class="fas fa-times"></i> مسح النموذج
+                    </button>
+                </div>
+            </section>
+        </div>
+        
+        <footer>
+            <p>© 2023 نظام حجز طلاب البرمجة - النسخة الآمنة</p>
+            <p>جميع الحقوق محفوظة - لا يمكن الوصول للبيانات إلا بكلمة مرور</p>
+        </footer>
+    </div>
+    
+    <!-- صفحة كلمة المرور -->
+    <div class="password-page" id="passwordPage">
+        <div class="password-box">
+            <i class="fas fa-lock lock-icon"></i>
+            <h2>منطقة المطور الآمنة</h2>
+            <p>هذه المنطقة مخصصة للمطور فقط. يرجى إدخال كلمة المرور للوصول إلى بيانات الطلاب</p>
+            
+            <div class="password-input">
+                <input type="password" id="securePassword" placeholder="كلمة المرور السرية">
+            </div>
+            
+            <div class="password-actions">
+                <button class="btn btn-danger" onclick="closePasswordPage()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+                <button class="btn btn-primary" onclick="openStudentsPage()">
+                    <i class="fas fa-unlock"></i> فتح النظام
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- صفحة عرض الطلاب -->
+    <div class="students-page" id="studentsPage">
+        <div class="container">
+            <div class="students-header">
+                <h2><i class="fas fa-users-cog"></i> بيانات الطلاب المسجلين <span class="secure-badge"><i class="fas fa-shield-alt"></i> آمن</span></h2>
+                <button class="btn btn-danger" onclick="closeStudentsPage()">
+                    <i class="fas fa-times"></i> إغلاق
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            
+                            <th>الرقم</th>
+                            <th>الاسم الأول</th>
+                            <th>اللقب</th>
+                            <th>العمر</th>
+                            <th>الجنس</th>
+                            <th>رقم الهاتف</th>
+                            <th>تاريخ الإضافة</th>
+                            <th>إجراءات</th>
+                          
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- سيتم ملؤها بالبيانات -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="noStudentsMessage" class="no-data">
+                <i class="fas fa-info-circle"></i> لا توجد بيانات طلاب مسجلة بعد
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+                <button class="btn btn-warning" onclick="closeStudentsPage()">
+                    <i class="fas fa-lock"></i> قفل النظام والعودة
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+    
+  <script>
+    const PASSWORD_HASH = "7e63e00e300e3608672da92f1c01c3b3ab82d4a2e315000dc0381a5a7cb11c6c";
+
+    document.addEventListener('DOMContentLoaded', function () {
+        loadStudents();
+
+        document.getElementById('devButton').addEventListener('click', function () {
+            document.getElementById('passwordPage').classList.add('active');
+            document.getElementById('securePassword').focus();
+        });
+    });
+
+    function addStudent() {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        const age = document.getElementById('age').value;
+        const phone = document.getElementById('phone').value.trim();
+        const gender = document.querySelector('input[name="gender"]:checked');
+
+        if (!firstName || !lastName || !age || !phone || !gender) {
+            showNotification('يرجى ملء جميع الحقول المطلوبة', 'error');
+            return;
+        }
+
+        const student = {
+            id: Date.now(),
+            firstName,
+            lastName,
+            age,
+            phone,
+            gender: gender.value,
+            date: new Date().toLocaleString('ar-EG')
+        };
+
+        let students = JSON.parse(localStorage.getItem('students') || '[]');
+        students.push(student);
+        localStorage.setItem('students', JSON.stringify(students));
+
+        showNotification('تم إضافة الطالب بنجاح!');
+        clearForm();
+    }
+
+    function loadStudents() {
+        const students = JSON.parse(localStorage.getItem('students') || '[]');
+        const tableBody = document.getElementById('studentsTableBody');
+        const noDataMessage = document.getElementById('noStudentsMessage');
+
+        if (students.length === 0) {
+            tableBody.innerHTML = '';
+            noDataMessage.style.display = 'block';
+            return;
+        }
+
+        noDataMessage.style.display = 'none';
+
+        let tableContent = '';
+        students.forEach((student, index) => {
+            tableContent += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${student.firstName}</td>
+                    <td>${student.lastName}</td>
+                    <td>${student.age}</td>
+                    <td>${student.gender === 'male' ? 'ذكر' : 'أنثى'}</td>
+                    <td>${student.phone}</td>
+                    <td>${student.date}</td>
+                    <td>
+                        <button class="btn btn-danger" style="padding: 5px 10px; font-size: 0.9rem;" onclick="deleteStudent(${student.id})">
+                            حذف
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        tableBody.innerHTML = tableContent;
+    }
+
+    function deleteStudent(studentId) {
+        let students = JSON.parse(localStorage.getItem('students') || '[]');
+        students = students.filter(student => student.id !== studentId);
+        localStorage.setItem('students', JSON.stringify(students));
+        loadStudents();
+        showNotification('تم حذف الطالب.');
+    }
+
+    function clearForm() {
+        document.getElementById('firstName').value = '';
+        document.getElementById('lastName').value = '';
+        document.getElementById('age').value = '';
+        document.getElementById('phone').value = '';
+        document.querySelectorAll('input[name="gender"]').forEach(radio => {
+            radio.checked = false;
+        });
+        document.querySelectorAll('.gender-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+    }
+
+    function selectGender(gender) {
+        document.querySelectorAll('.gender-option').forEach(option => {
+            option.classList.remove('selected');
+        });
+
+        const selectedOption = document.querySelector(`.gender-option input[value="${gender}"]`).parentElement;
+        selectedOption.classList.add('selected');
+        document.querySelector(`input[value="${gender}"]`).checked = true;
+    }
+
+    async function openStudentsPage() {
+        const inputPassword = document.getElementById('securePassword').value;
+
+        const encoder = new TextEncoder();
+        const data = encoder.encode(inputPassword);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        if (hashHex === PASSWORD_HASH) {
+            document.getElementById('passwordPage').classList.remove('active');
+            document.getElementById('studentsPage').classList.add('active');
+            loadStudents();
+            document.getElementById('securePassword').value = '';
+        } else {
+            showNotification('كلمة المرور غير صحيحة!', 'error');
+            document.getElementById('securePassword').value = '';
+            document.getElementById('securePassword').focus();
+        }
+    }
+
+    function closePasswordPage() {
+        document.getElementById('passwordPage').classList.remove('active');
+        document.getElementById('securePassword').value = '';
+    }
+
+    function closeStudentsPage() {
+        document.getElementById('studentsPage').classList.remove('active');
+    }
+
+    function showNotification(message, type = 'success') {
+        const notification = document.getElementById('notification');
+        notification.textContent = message;
+        notification.className = 'notification';
+
+        if (type === 'error') {
+            notification.classList.add('error');
+        } else {
+            notification.classList.add('success');
+        }
+
+        notification.classList.add('show');
+
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
+    }
+</script>
+</body>
+</html>
