@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ثانوية مفدي زكريا — إدارة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo&display=swap" rel="stylesheet">
+<style>
+   :root {
+            --primary: #1a237e;
+            --primary-dark: #0d1440;
+            --primary-light: #303f9f;
+            --secondary: #121212;
+            --accent: #00e5ff;
+            --accent-glow: rgba(0, 229, 255, 0.7);
+            --text: #e0e0e0;
+            --text-light: #b0b0b0;
+            --white: #1e1e1e;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.3);
+            --radius: 16px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: var(--text);
+            line-height: 1.6;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        /* خلفية الفضاء */
+        .space-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #eee, transparent),
+                radial-gradient(2px 2px at 40px 70px, #fff, transparent),
+                radial-gradient(1px 1px at 90px 40px, #ddd, transparent),
+                radial-gradient(1px 1px at 130px 80px, #fff, transparent),
+                radial-gradient(2px 2px at 160px 30px, #eee, transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: stars-animation 120s linear infinite;
+        }
+
+        .galaxy {
+            position: absolute;
+            top: 20%;
+            right: 10%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, 
+                rgba(74, 0, 224, 0.3) 0%, 
+                rgba(74, 0, 224, 0.1) 40%, 
+                transparent 70%);
+            filter: blur(20px);
+            animation: galaxy-rotate 100s linear infinite;
+        }
+
+        .nebula {
+            position: absolute;
+            bottom: 20%;
+            left: 10%;
+            width: 400px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(ellipse at center, 
+                rgba(255, 0, 128, 0.2) 0%, 
+                rgba(255, 0, 128, 0.05) 40%, 
+                transparent 70%);
+            filter: blur(30px);
+            animation: nebula-pulse 20s ease-in-out infinite alternate;
+        }
+
+        .app {
+            width: 100%;
+            height: 100vh;
+            background: rgba(10, 10, 30, 0.8);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--text);
+            text-align: center;
+            padding: 1.2rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            box-shadow: var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.3);
+            text-shadow: 0 0 10px var(--accent-glow);
+            z-index: 10;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            animation: shimmer 3s infinite;
+        }
+
+        .page-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            position: relative;
+        }
+
+        .page {
+            display: none;
+            animation: fadeInUp 0.5s ease-out;
+            height: 100%;
+        }
+
+        .active {
+            display: block;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: var(--secondary);
+            border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+            overflow-x: auto;
+            scrollbar-width: none;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .nav-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: var(--text-light);
+            white-space: nowrap;
+            min-width: 80px;
+        }
+
+        .nav-tab.active {
+            color: var(--accent);
+            border-bottom: 3px solid var(--accent);
+            background: rgba(0, 229, 255, 0.05);
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .nav-tab:hover {
+            background: rgba(0, 229, 255, 0.1);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 1rem;
+            margin: 0.7rem 0;
+            border-radius: 12px;
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            box-sizing: border-box;
+            transition: var(--transition);
+            background: rgba(20, 20, 40, 0.7);
+            color: var(--text);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.2), inset 0 2px 5px rgba(0, 0, 0, 0.5);
+            background: rgba(30, 30, 60, 0.7);
+            transform: translateY(-2px);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            margin: 0.7rem 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.2) 0%, rgba(0, 229, 255, 0.1) 100%);
+            color: var(--accent);
+            border: 1px solid rgba(0, 229, 255, 0.4);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 700;
+            font-size: 1rem;
+            font-family: 'Cairo', sans-serif;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            text-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.3) 0%, transparent 100%);
+            transform: translateX(-100%);
+            transition: var(--transition);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.3) 0%, rgba(0, 229, 255, 0.2) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5), 0 0 15px var(--accent-glow);
+        }
+
+        button:hover::before {
+            transform: translateX(0);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5), 0 0 10px var(--accent-glow);
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, var(--accent) 0%, #00bcd4 100%);
+            color: var(--primary-dark);
+            border: 1px solid var(--accent);
+            text-shadow: none;
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, rgba(40, 40, 70, 0.7) 0%, rgba(30, 30, 60, 0.7) 100%);
+            color: var(--text);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        button.secondary:hover {
+            background: linear-gradient(135deg, rgba(50, 50, 90, 0.7) 0%, rgba(40, 40, 80, 0.7) 100%);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            animation: tableFadeIn 0.6s ease-out;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        th, td {
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 0.8rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: var(--text);
+            font-weight: 700;
+            text-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        tr:nth-child(even) {
+            background: rgba(0, 229, 255, 0.05);
+        }
+
+        tr:hover {
+            background: rgba(0, 229, 255, 0.1);
+            transform: scale(1.01);
+        }
+
+        .error {
+            color: #ff5252;
+            font-size: 0.85rem;
+            margin-top: -0.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+            animation: shake 0.5s ease-in-out;
+            text-shadow: 0 0 5px rgba(255, 82, 82, 0.7);
+        }
+
+        #newsTicker {
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+            background: linear-gradient(135deg, rgba(20, 20, 40, 0.7) 0%, rgba(30, 30, 60, 0.7) 100%);
+            padding: 0.8rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            position: relative;
+            box-shadow: var(--shadow-light);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        #newsTicker::before {
+            content: '📢';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 2;
+        }
+
+        #newsTicker span {
+            display: inline-block;
+            padding-right: 40px;
+            animation: ticker 20s linear infinite;
+            font-weight: 600;
+            color: var(--accent);
+            text-shadow: 0 0 5px var(--accent-glow);
+        }
+
+        .card {
+            background: rgba(20, 20, 40, 0.7);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow-light);
+            transition: var(--transition);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+
+        .loader {
+            border: 4px solid rgba(30, 30, 60, 0.7);
+            border-top: 4px solid var(--accent);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin: 0 auto;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        h3, h4 {
+            color: var(--accent);
+            text-shadow: 0 0 8px var(--accent-glow);
+            margin-bottom: 1rem;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background: rgba(30, 30, 60, 0.7);
+            margin: 0.5rem 0;
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .available { color: #00e676; }
+        .pending { color: #ff9800; }
+        .borrowed { color: #2196f3; }
+        .unavailable { color: #f44336; }
+
+        @keyframes appSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes tableFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes ticker {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(0, 229, 255, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 229, 255, 0);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-5px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(5px);
+            }
+        }
+
+        @keyframes stars-animation {
+            from {
+                transform: translateY(0);
+            }
+            to {
+                transform: translateY(-100px);
+            }
+        }
+
+        @keyframes galaxy-rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes nebula-pulse {
+            from {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0.7;
+                transform: scale(1.1);
+            }
+        }
+
+        /* تحسينات للشاشات الصغيرة */
+        @media (max-width: 480px) {
+            .page-container {
+                padding: 0.8rem;
+            }
+            
+            .card {
+                padding: 1.2rem;
+            }
+            
+            header {
+                padding: 1rem;
+                font-size: 1.1rem;
+            }
+            
+            input, select, button {
+                padding: 0.9rem;
+            }
+            
+            th, td {
+                padding: 0.6rem 0.4rem;
+                font-size: 0.85rem;
+            }
+            
+            .galaxy, .nebula {
+                display: none;
+            }
+        }
+</style>
+</head>
+<body>
+<div class="space-background">
+    <div class="stars"></div>
+    <div class="galaxy"></div>
+    <div class="nebula"></div>
+</div>
+
+<div class="app">
+  <header>ثانوية مفدي زكريا</header>
+
+  <div class="page-container">
+    <!-- الصفحة الرئيسية -->
+    <div class="page active" id="homePage">
+      <button onclick="openPage('studentRegister')" class="primary">تسجيل تلميذ</button>
+      <button onclick="openPage('studentLogin')">دخول تلميذ</button>
+      <button onclick="openPage('adminLogin')">دخول المدير</button>
+      <button onclick="openPage('librarianLogin')">دخول المكتبة</button>
+    </div>
+
+    <!-- تسجيل التلميذ -->
+    <div class="page" id="studentRegister">
+      <h3>تسجيل التلميذ</h3>
+      <input id="sName" placeholder="الإسم">
+      <span class="error" id="nameError"></span>
+      <input id="sLast" placeholder="اللقب">
+      <span class="error" id="lastError"></span>
+      <input id="sClass" placeholder="القسم">
+      <select id="sGender"><option value="ذكر">ذكر</option><option value="أنثى">أنثى</option></select>
+      <input id="sPassword" type="password" placeholder="كلمة المرور">
+      <button onclick="registerStudent()">إرسال</button>
+      <button onclick="backToHome()" class="secondary">رجوع</button>
+      <p id="registerMsg"></p>
+    </div>
+
+    <!-- دخول التلميذ -->
+    <div class="page" id="studentLogin">
+      <h3>دخول التلميذ</h3>
+      <input id="loginName" placeholder="الإسم">
+      <input id="loginLast" placeholder="اللقب">
+      <input id="loginPass" type="password" placeholder="كلمة المرور">
+      <button onclick="loginStudent()">دخول</button>
+      <button onclick="backToHome()" class="secondary">رجوع</button>
+      <p id="loginMsg"></p>
+    </div>
+
+    <!-- صفحة التلميذ -->
+    <div class="page" id="studentPage">
+      <h3>مرحباً <span id="studentWelcome"></span></h3>
+      <button onclick="openPage('libraryPage')" class="primary">المكتبة</button>
+      <div id="newsTicker"><span id="newsContent"></span></div>
+      <h4>إشعاراتك</h4>
+      <ul id="studentMessages"></ul>
+      <button onclick="logoutStudent()" class="secondary">خروج</button>
+    </div>
+
+    <!-- صفحة المكتبة للتلميذ -->
+    <div class="page" id="libraryPage">
+      <h3>المكتبة</h3>
+      <input id="bookSearch" placeholder="بحث عن كتاب..." oninput="searchBooks()">
+      <button onclick="renderBooks()" class="secondary">عرض جميع الكتب</button>
+      <table id="booksTable"><tr><th>الكتاب</th><th>الحالة</th><th>طلب</th></tr></table>
+      <button onclick="backToStudent()" class="secondary">رجوع</button>
+    </div>
+
+    <!-- دخول المدير -->
+    <div class="page" id="adminLogin">
+      <h3>دخول المدير</h3>
+      <input id="adminPass" type="password" placeholder="كلمة مرور المدير">
+      <button onclick="loginAdmin()">دخول</button>
+      <button onclick="backToHome()" class="secondary">رجوع</button>
+      <p id="adminMsg"></p>
+    </div>
+
+    <!-- صفحة المدير -->
+    <div class="page" id="adminPage">
+      <h3>لوحة المدير</h3>
+
+      <h4>طلبات التسجيل</h4>
+      <table id="pendingStudentsTable"><tr><th>الإسم</th><th>اللقب</th><th>القسم</th><th>الجنس</th><th>كلمة المرور</th><th>قبول</th><th>حذف</th></tr></table>
+
+      <h4>التلاميذ المقبولون</h4>
+      <table id="acceptedStudentsTable"><tr><th>الإسم</th><th>اللقب</th><th>القسم</th><th>الجنس</th><th>كلمة المرور</th><th>حذف</th></tr></table>
+
+      <h4>الأخبار الحالية</h4>
+      <table id="newsTable"><tr><th>الخبر</th><th>حذف</th></tr></table>
+
+      <h4>شريط الأخبار</h4>
+      <input id="newsInput" placeholder="أضف خبر جديد">
+      <button onclick="addNews()">إرسال</button>
+      <button onclick="backToHome()" class="secondary">خروج</button>
+    </div>
+
+    <!-- دخول المكتبي -->
+    <div class="page" id="librarianLogin">
+      <h3>دخول صاحب المكتبة</h3>
+      <input id="libPass" type="password" placeholder="كلمة مرور المكتبة">
+      <button onclick="loginLibrarian()">دخول</button>
+      <button onclick="backToHome()" class="secondary">رجوع</button>
+      <p id="libMsg"></p>
+    </div>
+
+    <!-- صفحة المكتبي -->
+    <div class="page" id="librarianPage">
+      <h3>لوحة المكتبة</h3>
+      <input id="newBookTitle" placeholder="أضف كتاب جديد">
+      <button onclick="addBook()">إضافة كتاب</button>
+      <table id="booksLibraryTable"><tr><th>الكتاب</th><th>متاح؟</th><th>حذف</th></tr></table>
+
+      <h4>طلبات الكتب</h4>
+      <table id="requestsTable"><tr><th>اسم التلميذ</th><th>القسم</th><th>الكتاب</th><th>الموافقة</th><th>الرفض</th></tr></table>
+
+      <h3>الكتب المستعارة</h3>
+      <table id="borrowedBooksTable"><thead><tr><th>اسم الكتاب</th><th>اسم التلميذ</th><th>مدة الاسترجاع</th><th>إرجاع</th></tr></thead><tbody></tbody></table>
+
+      <button onclick="logoutLibrarian()" class="secondary">خروج</button>
+    </div>
+  </div>
+</div>
+
+<!-- استخدم imports المودولار فقط -->
+<script type="module">
+// Firebase (modular)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, onSnapshot,
+  updateDoc, doc, query, where, deleteDoc, getDoc
+} from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA5mE3ywlxIkgSGSTGRBGx5Z1nt4dTNtac",
+  authDomain: "mofdizakria-62b05.firebaseapp.com",
+  projectId: "mofdizakria-62b05",
+  storageBucket: "mofdizakria-62b05.appspot.com",
+  messagingSenderId: "422813644523",
+  appId: "1:422813644523:web:e779a0a84087d05a2870ae"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+let currentStudent = null;
+let allBooks = [];
+let bookRequests = [];
+
+// ---------- تنقل ----------
+window.openPage = id => { 
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); 
+  document.getElementById(id).classList.add('active'); 
+}
+
+window.backToHome = () => openPage('homePage');
+window.backToStudent = () => openPage('studentPage');
+
+window.logoutStudent = () => { 
+  currentStudent = null; 
+  backToHome(); 
+  renderNews(); 
+  renderBooks(); 
+  renderStudentMessages(); 
+}
+
+window.logoutLibrarian = () => backToHome();
+
+// ---------- تسجيل تلميذ ----------
+window.registerStudent = async () => {
+  const name = document.getElementById('sName').value.trim();
+  const last = document.getElementById('sLast').value.trim();
+  const sClass = document.getElementById('sClass').value.trim();
+  const gender = document.getElementById('sGender').value;
+  const password = document.getElementById('sPassword').value.trim();
+  const registerMsg = document.getElementById('registerMsg');
+
+  if(!name || !last || !sClass || !password){ 
+    registerMsg.innerText = 'املأ جميع الحقول'; 
+    return; 
+  }
+
+  try {
+    // تحقق التكرار الكامل (name+last+sClass+gender)
+    const qDup = query(collection(db,'pendingStudents'), 
+      where('name','==',name), 
+      where('last','==',last), 
+      where('sClass','==',sClass), 
+      where('gender','==',gender));
+    const dupSnap = await getDocs(qDup);
+    
+    const qDup2 = query(collection(db,'acceptedStudents'), 
+      where('name','==',name), 
+      where('last','==',last), 
+      where('sClass','==',sClass), 
+      where('gender','==',gender));
+    const dupSnap2 = await getDocs(qDup2);
+    
+    if(!dupSnap.empty || !dupSnap2.empty){ 
+      registerMsg.innerText = 'يوجد تلميذ بنفس المعلومات'; 
+      return; 
+    }
+
+    await addDoc(collection(db,'pendingStudents'), { name, last, sClass, gender, password });
+    registerMsg.innerText = 'تم إرسال الطلب بانتظار الموافقة';
+    document.getElementById('sName').value=''; 
+    document.getElementById('sLast').value=''; 
+    document.getElementById('sClass').value=''; 
+    document.getElementById('sPassword').value='';
+  } catch (error) {
+    console.error('Error registering student:', error);
+    registerMsg.innerText = 'حدث خطأ أثناء التسجيل';
+  }
+}
+
+// ---------- دخول تلميذ ----------
+window.loginStudent = async () => {
+  const name = document.getElementById('loginName').value.trim();
+  const last = document.getElementById('loginLast').value.trim();
+  const password = document.getElementById('loginPass').value.trim();
+  
+  if (!name || !last || !password) {
+    document.getElementById('loginMsg').innerText = 'يرجى ملء جميع الحقول';
+    return;
+  }
+  
+  try {
+    const q = query(collection(db,'acceptedStudents'), 
+      where('name','==',name), 
+      where('last','==',last), 
+      where('password','==',password));
+    const snap = await getDocs(q);
+    
+    if(snap.empty){ 
+      document.getElementById('loginMsg').innerText = 'الإسم/اللقب أو كلمة المرور غير صحيحة أو لم يتم الموافقة'; 
+      return; 
+    }
+    
+    const docSnap = snap.docs[0];
+    currentStudent = { 
+      id: docSnap.id, 
+      ...docSnap.data() 
+    };
+    
+    // التحقق من أن البيانات موجودة
+    if (!currentStudent.id || !currentStudent.name) {
+      document.getElementById('loginMsg').innerText = 'خطأ في بيانات المستخدم';
+      return;
+    }
+    
+    document.getElementById('studentWelcome').innerText = `${currentStudent.name} ${currentStudent.last}`;
+    openPage('studentPage');
+    renderNews(); 
+    renderBooks(); 
+    renderStudentMessages();
+  } catch (error) {
+    console.error('Login error:', error);
+    document.getElementById('loginMsg').innerText = 'حدث خطأ أثناء تسجيل الدخول';
+  }
+}
+
+// ---------- الأخبار ----------
+window.addNews = async () => {
+  const newsInput = document.getElementById('newsInput');
+  const news = newsInput.value.trim();
+  if(!news) return;
+  
+  try {
+    await addDoc(collection(db,'news'), { text: news, createdAt: Date.now() });
+    newsInput.value = '';
+    renderNews();
+    renderNewsAdmin();
+  } catch (error) {
+    console.error('Error adding news:', error);
+    alert('حدث خطأ أثناء إضافة الخبر');
+  }
+}
+
+async function renderNews(){
+  try {
+    const snap = await getDocs(collection(db,'news'));
+    const arr = [];
+    snap.forEach(d=>arr.push(d.data().text));
+    document.getElementById('newsContent').innerText = arr.join(' — ');
+  } catch (error) {
+    console.error('Error rendering news:', error);
+  }
+}
+window.renderNews = renderNews;
+
+async function renderNewsAdmin(){
+  try {
+    const table = document.getElementById('newsTable');
+    table.innerHTML = '<tr><th>الخبر</th><th>حذف</th></tr>';
+    const snap = await getDocs(collection(db,'news'));
+    snap.forEach(d=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${d.data().text}</td><td><button onclick="deleteNews('${d.id}')">حذف</button></td>`;
+      table.appendChild(tr);
+    });
+  } catch (error) {
+    console.error('Error rendering admin news:', error);
+  }
+}
+window.renderNewsAdmin = renderNewsAdmin;
+
+window.deleteNews = async (id) => {
+  if(!confirm('تأكيد حذف الخبر؟')) return;
+  
+  try {
+    await deleteDoc(doc(db,'news',id));
+    await renderNews(); 
+    await renderNewsAdmin();
+  } catch (error) {
+    console.error('Error deleting news:', error);
+    alert('حدث خطأ أثناء حذف الخبر');
+  }
+}
+
+// ---------- مدير: طلبات التسجيل وقبول/حذف ----------
+async function renderPendingStudents(){
+  try {
+    const table = document.getElementById('pendingStudentsTable');
+    table.innerHTML = '<tr><th>الإسم</th><th>اللقب</th><th>القسم</th><th>الجنس</th><th>كلمة المرور</th><th>قبول</th><th>حذف</th></tr>';
+    const snap = await getDocs(collection(db,'pendingStudents'));
+    snap.forEach(d=>{
+      const data = d.data();
+      const row = table.insertRow();
+      row.insertCell().innerText = data.name;
+      row.insertCell().innerText = data.last;
+      row.insertCell().innerText = data.sClass;
+      row.insertCell().innerText = data.gender;
+      row.insertCell().innerText = data.password;
+      const btnAccept = document.createElement('button');
+      btnAccept.innerText = 'قبول';
+      btnAccept.onclick = ()=> approveStudent(d.id);
+      row.insertCell().appendChild(btnAccept);
+      const btnDel = document.createElement('button');
+      btnDel.innerText = 'حذف';
+      btnDel.onclick = ()=> deletePendingStudent(d.id);
+      row.insertCell().appendChild(btnDel);
+    });
+  } catch (error) {
+    console.error('Error rendering pending students:', error);
+  }
+}
+window.renderPendingStudents = renderPendingStudents;
+
+window.approveStudent = async (id) => {
+  try {
+    // قبول التلميذ (نقل من pending إلى accepted)
+    const snap = await getDoc(doc(db,'pendingStudents',id));
+    if(!snap.exists()) return;
+    const data = snap.data();
+    await addDoc(collection(db,'acceptedStudents'), data);
+    await deleteDoc(doc(db,'pendingStudents',id));
+    renderPendingStudents(); 
+    renderAcceptedStudents();
+  } catch (error) {
+    console.error('Error approving student:', error);
+    alert('حدث خطأ أثناء قبول الطالب');
+  }
+}
+
+window.deletePendingStudent = async (id) => {
+  try {
+    await deleteDoc(doc(db,'pendingStudents',id));
+    renderPendingStudents();
+  } catch (error) {
+    console.error('Error deleting pending student:', error);
+    alert('حدث خطأ أثناء حذف الطالب');
+  }
+}
+
+async function renderAcceptedStudents(){
+  try {
+    const table = document.getElementById('acceptedStudentsTable');
+    table.innerHTML = '<tr><th>الإسم</th><th>اللقب</th><th>القسم</th><th>الجنس</th><th>كلمة المرور</th><th>حذف</th></tr>';
+    const snap = await getDocs(collection(db,'acceptedStudents'));
+    snap.forEach(d=>{
+      const data = d.data();
+      const row = table.insertRow();
+      row.insertCell().innerText = data.name;
+      row.insertCell().innerText = data.last;
+      row.insertCell().innerText = data.sClass;
+      row.insertCell().innerText = data.gender;
+      row.insertCell().innerText = data.password;
+      const btnDel = document.createElement('button');
+      btnDel.innerText = 'حذف';
+      btnDel.onclick = ()=> deleteAcceptedStudent(d.id);
+      row.insertCell().appendChild(btnDel);
+    });
+  } catch (error) {
+    console.error('Error rendering accepted students:', error);
+  }
+}
+window.renderAcceptedStudents = renderAcceptedStudents;
+
+window.deleteAcceptedStudent = async (id) => {
+  try {
+    await deleteDoc(doc(db,'acceptedStudents',id));
+    renderAcceptedStudents();
+  } catch (error) {
+    console.error('Error deleting accepted student:', error);
+    alert('حدث خطأ أثناء حذف الطالب');
+  }
+}
+
+// ---------- المكتبي: كتب + طلبات + موافقة/رفض + borrowedBooks ----------
+window.addBook = async () => {
+  const t = document.getElementById('newBookTitle').value.trim();
+  if(!t) return;
+  
+  try {
+    await addDoc(collection(db,'books'), { title: t, available: true });
+    document.getElementById('newBookTitle').value = '';
+    renderBooksLibrary(); 
+    renderBooks();
+  } catch (error) {
+    console.error('Error adding book:', error);
+    alert('حدث خطأ أثناء إضافة الكتاب');
+  }
+}
+
+window.deleteBook = async (id) => {
+  try {
+    await deleteDoc(doc(db,'books',id));
+    renderBooksLibrary(); 
+    renderBooks();
+  } catch (error) {
+    console.error('Error deleting book:', error);
+    alert('حدث خطأ أثناء حذف الكتاب');
+  }
+}
+
+async function renderBooksLibrary(){
+  try {
+    const table = document.getElementById('booksLibraryTable');
+    table.innerHTML = '<tr><th>الكتاب</th><th>متاح؟</th><th>حذف</th></tr>';
+    const snap = await getDocs(collection(db,'books'));
+    snap.forEach(d=>{
+      const data = d.data();
+      const row = table.insertRow();
+      row.insertCell().innerText = data.title;
+      row.insertCell().innerText = data.available ? 'متاح' : 'غير متاح';
+      const btnDel = document.createElement('button');
+      btnDel.innerText = 'حذف';
+      btnDel.onclick = ()=> deleteBook(d.id);
+      row.insertCell().appendChild(btnDel);
+    });
+  } catch (error) {
+    console.error('Error rendering books library:', error);
+  }
+}
+window.renderBooksLibrary = renderBooksLibrary;
+
+// البحث عن الكتب
+window.searchBooks = async () => {
+  const searchText = document.getElementById('bookSearch').value.toLowerCase().trim();
+  if (!searchText) {
+    renderBooks();
+    return;
+  }
+  
+  const filteredBooks = allBooks.filter(book => 
+    book.title.toLowerCase().includes(searchText)
+  );
+  
+  displayBooks(filteredBooks);
+}
+
+// دالة للتحقق من حالة المستخدم
+function checkStudentAuth() {
+  if (!currentStudent || !currentStudent.id) {
+    alert('يجب تسجيل الدخول أولاً');
+    openPage('studentLogin');
+    return false;
+  }
+  return true;
+}
+
+// طلب الكتب من التلميذ
+window.requestBook = async (bookId, bookTitle) => {
+  // تحقق مزدوج من وجود currentStudent
+  if(!currentStudent || !currentStudent.id) { 
+    alert('يجب تسجيل الدخول أولاً'); 
+    openPage('studentLogin');
+    return; 
+  }
+  
+  try {
+    // التحقق مما إذا كان التلميذ قد طلب هذا الكتاب بالفعل
+    const existingRequest = bookRequests.find(req => 
+      req.studentId === currentStudent.id && req.bookId === bookId && req.status === 'pending'
+    );
+    
+    if (existingRequest) {
+      alert('لقد قمت بطلب هذا الكتاب مسبقاً');
+      return;
+    }
+    
+    await addDoc(collection(db,'bookRequests'), {
+      studentId: currentStudent.id,
+      studentName: `${currentStudent.name} ${currentStudent.last}`,
+      studentClass: currentStudent.sClass,
+      bookId, bookTitle,
+      status: 'pending',
+      createdAt: Date.now()
+    });
+    
+    // تحديث حالة الزر مباشرة
+    const button = document.querySelector(`button[data-book-id="${bookId}"]`);
+    if (button) {
+      button.innerText = 'تم إرسال الطلب';
+      button.disabled = true;
+    }
+    
+    // إعادة تحميل قائمة الطلبات
+    await loadBookRequests();
+    alert('تم إرسال الطلب بنجاح');
+  } catch (error) {
+    console.error('Error requesting book:', error);
+    alert('حدث خطأ أثناء إرسال الطلب');
+  }
+}
+
+// تحميل طلبات الكتب
+async function loadBookRequests() {
+  if (currentStudent && currentStudent.id) {
+    try {
+      const q = query(collection(db, 'bookRequests'), where('studentId', '==', currentStudent.id));
+      const snap = await getDocs(q);
+      bookRequests = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } catch (error) {
+      console.error('Error loading book requests:', error);
+      bookRequests = [];
+    }
+  } else {
+    bookRequests = [];
+  }
+}
+
+// عرض الكتب للتلميذ
+async function renderBooks() {
+  const tbl = document.getElementById('booksTable');
+  tbl.innerHTML = '<tr><th>الكتاب</th><th>الحالة</th><th>طلب</th></tr>';
+  
+  try {
+    // تحميل الكتب وطلبات الكتب
+    const booksSnap = await getDocs(collection(db, 'books'));
+    allBooks = booksSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    // تحميل طلبات الكتب فقط إذا كان المستخدم مسجل الدخول
+    if (currentStudent && currentStudent.id) {
+      await loadBookRequests();
+    } else {
+      bookRequests = [];
+    }
+    
+    displayBooks(allBooks);
+  } catch (error) {
+    console.error('Error loading books:', error);
+    tbl.innerHTML = '<tr><td colspan="3">حدث خطأ في تحميل الكتب</td></tr>';
+  }
+}
+
+// عرض الكتب في الجدول
+function displayBooks(books) {
+  const tbl = document.getElementById('booksTable');
+  tbl.innerHTML = '<tr><th>الكتاب</th><th>الحالة</th><th>طلب</th></tr>';
+  
+  if (books.length === 0) {
+    tbl.innerHTML = '<tr><td colspan="3">لا توجد كتب</td></tr>';
+    return;
+  }
+  
+  books.forEach(book => {
+    const row = tbl.insertRow();
+    row.insertCell().innerText = book.title;
+    
+    // تحديد حالة الكتاب
+    let status = 'متاح';
+    let statusClass = 'available';
+    let canRequest = book.available;
+    
+    // التحقق مما إذا كان الكتاب مطلوباً من قبل التلميذ الحالي
+    const studentRequest = currentStudent ? 
+      bookRequests.find(req => req.bookId === book.id && req.studentId === currentStudent.id) 
+      : null;
+    
+    if (studentRequest) {
+      if (studentRequest.status === 'pending') {
+        status = 'بانتظار الموافقة';
+        statusClass = 'pending';
+        canRequest = false;
+      } else if (studentRequest.status === 'approved') {
+        status = 'مستعار';
+        statusClass = 'borrowed';
+        canRequest = false;
+      }
+    } else if (!book.available) {
+      status = 'غير متاح';
+      statusClass = 'unavailable';
+      canRequest = false;
+    }
+    
+    const statusCell = row.insertCell();
+    statusCell.innerText = status;
+    statusCell.className = statusClass;
+    
+    const actionCell = row.insertCell();
+    const btn = document.createElement('button');
+    
+    if (!currentStudent) {
+      btn.innerText = 'سجل الدخول للطلب';
+      btn.onclick = () => openPage('studentLogin');
+    } else if (studentRequest) {
+      if (studentRequest.status === 'pending') {
+        btn.innerText = 'تم إرسال الطلب';
+        btn.disabled = true;
+      } else if (studentRequest.status === 'approved') {
+        btn.innerText = 'مستعار';
+        btn.disabled = true;
+      }
+    } else if (canRequest) {
+      btn.innerText = 'طلب';
+      btn.onclick = () => requestBook(book.id, book.title);
+    } else {
+      btn.innerText = 'غير متاح';
+      btn.disabled = true;
+    }
+    
+    btn.setAttribute('data-book-id', book.id);
+    actionCell.appendChild(btn);
+  });
+}
+
+window.renderBooks = renderBooks;
+
+// عرض طلبات المكتبة (للمكتبي)
+async function renderRequests(){
+  try {
+    const table = document.getElementById('requestsTable');
+    table.innerHTML = '<tr><th>اسم التلميذ</th><th>القسم</th><th>الكتاب</th><th>الموافقة</th><th>الرفض</th></tr>';
+    const snap = await getDocs(collection(db,'bookRequests'));
+    snap.forEach(d=>{
+      const data = d.data();
+      if (data.status !== 'pending') return;
+      
+      const row = table.insertRow();
+      row.insertCell().innerText = data.studentName;
+      row.insertCell().innerText = data.studentClass;
+      row.insertCell().innerText = data.bookTitle;
+      const btnAp = document.createElement('button'); 
+      btnAp.innerText='موافقة';
+      btnAp.onclick = ()=> approveBook(d.id, data.bookId, data.bookTitle, data.studentId, data.studentName);
+      row.insertCell().appendChild(btnAp);
+      const btnRj = document.createElement('button'); 
+      btnRj.innerText='رفض';
+      btnRj.onclick = ()=> rejectBook(d.id, data.studentId, data.bookTitle);
+      row.insertCell().appendChild(btnRj);
+    });
+  } catch (error) {
+    console.error('Error rendering requests:', error);
+  }
+}
+window.renderRequests = renderRequests;
+
+window.approveBook = async (requestId, bookId, bookTitle, studentId, studentName) => {
+  const days = prompt('أدخل مدة الإرجاع بالأيام (مثال: 7):');
+  if(!days) return;
+  
+  try {
+    // تحديث حالة الطلب إلى موافق
+    await updateDoc(doc(db,'bookRequests', requestId), { status: 'approved' });
+    
+    // تحديث حالة الكتاب إلى غير متاح
+    await updateDoc(doc(db,'books', bookId), { available: false });
+    
+    // سجل الاستعارة في مجموعة borrowedBooks
+    const returnInfo = `${days} يوم/أيام`;
+    await addDoc(collection(db,'borrowedBooks'), {
+      bookId, bookTitle, studentId, studentName, returnInfo, 
+      borrowedAt: Date.now(), requestId: requestId
+    });
+    
+    // إشعار للتلميذ
+    await addDoc(collection(db,'notifications'), {
+      studentId, message: `تمت الموافقة على كتاب "${bookTitle}" لمدة ${returnInfo}`, read: false, createdAt: Date.now()
+    });
+    
+    renderRequests(); 
+    renderBooksLibrary(); 
+    renderBooks(); 
+    renderBorrowedBooks(); 
+    renderAdminNotifications();
+    alert('تمت الموافقة وإرسال إشعار للتلميذ');
+  } catch (error) {
+    console.error('Error approving book:', error);
+    alert('حدث خطأ أثناء الموافقة على الكتاب');
+  }
+}
+
+window.rejectBook = async (requestId, studentId, bookTitle) => {
+  try {
+    await updateDoc(doc(db,'bookRequests', requestId), { status: 'rejected' });
+    await addDoc(collection(db,'notifications'), { 
+      studentId, 
+      message: `تم رفض طلب كتاب "${bookTitle}"`, 
+      read: false, 
+      createdAt: Date.now() 
+    });
+    renderRequests(); 
+    renderAdminNotifications();
+    alert('تم الرفض وإرسال إشعار للتلميذ');
+  } catch (error) {
+    console.error('Error rejecting book:', error);
+    alert('حدث خطأ أثناء رفض الطلب');
+  }
+}
+
+// ---------- جدول الكتب المستعارة (onSnapshot ليحدّث تلقائياً) ----------
+const borrowedTbody = document.querySelector('#borrowedBooksTable tbody');
+function renderBorrowedBooks(){ /* fallback if onSnapshot not yet bound */ }
+window.renderBorrowedBooks = renderBorrowedBooks;
+
+onSnapshot(collection(db,'borrowedBooks'), snapshot=>{
+  // نملأ tbody
+  if(!borrowedTbody) return;
+  borrowedTbody.innerHTML = '';
+  snapshot.forEach(docSnap=>{
+    const b = docSnap.data();
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${b.bookTitle}</td>
+      <td>${b.studentName}</td>
+      <td>${b.returnInfo || ''}</td>
+      <td><button onclick="returnBook('${docSnap.id}','${b.bookId}','${b.requestId}')">إرجاع</button></td>
+    `;
+    borrowedTbody.appendChild(tr);
+  });
+});
+
+// دالة إرجاع الكتاب
+window.returnBook = async (borrowId, bookId, requestId) => {
+  if(!confirm('تأكيد إرجاع الكتاب؟')) return;
+  
+  try {
+    // تحديث حالة الطلب إلى مكتمل
+    if (requestId) {
+      await updateDoc(doc(db,'bookRequests', requestId), { status: 'returned' });
+    }
+    
+    // حذف سجل الاستعارة
+    await deleteDoc(doc(db,'borrowedBooks', borrowId));
+    
+    // تحديث حالة الكتاب إلى متاح
+    await updateDoc(doc(db,'books', bookId), { available: true });
+    
+    renderBooksLibrary(); 
+    renderBooks(); 
+    renderBorrowedBooks();
+    alert('تم إرجاع الكتاب وأصبح متاحاً للطلب مرة أخرى');
+  } catch (error) {
+    console.error('Error returning book:', error);
+    alert('حدث خطأ أثناء إرجاع الكتاب');
+  }
+}
+
+// ---------- إشعارات التلميذ ----------
+async function renderStudentMessages(){
+  if(!currentStudent || !currentStudent.id) {
+    const ul = document.getElementById('studentMessages');
+    ul.innerHTML = '<li>يجب تسجيل الدخول لعرض الإشعارات</li>';
+    return;
+  }
+  
+  try {
+    const ul = document.getElementById('studentMessages');
+    ul.innerHTML = '';
+    const q = query(collection(db,'notifications'), where('studentId','==', currentStudent.id));
+    const snap = await getDocs(q);
+    
+    if (snap.empty) {
+      ul.innerHTML = '<li>لا توجد إشعارات</li>';
+      return;
+    }
+    
+    snap.forEach(d=>{
+      const data = d.data();
+      const li = document.createElement('li');
+      li.innerHTML = `${data.message} ${data.read ? '(مقروء)' : '(غير مقروء)'} 
+        <button onclick="markNotifRead('${d.id}')">وضع كمقروء</button> 
+        <button onclick="deleteNotif('${d.id}')">حذف</button>`;
+      ul.appendChild(li);
+    });
+  } catch (error) {
+    console.error('Error loading messages:', error);
+    const ul = document.getElementById('studentMessages');
+    ul.innerHTML = '<li>حدث خطأ في تحميل الإشعارات</li>';
+  }
+}
+window.renderStudentMessages = renderStudentMessages;
+
+window.markNotifRead = async (id) => {
+  if (!checkStudentAuth()) return;
+  
+  try {
+    await updateDoc(doc(db,'notifications',id), { read: true });
+    renderStudentMessages(); 
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    alert('حدث خطأ أثناء تحديث الإشعار');
+  }
+}
+
+window.deleteNotif = async (id) => {
+  if (!checkStudentAuth()) return;
+  
+  try {
+    await deleteDoc(doc(db,'notifications',id));
+    renderStudentMessages(); 
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    alert('حدث خطأ أثناء حذف الإشعار');
+  }
+}
+
+// عرض إشعارات المدير (جدول عام)
+async function renderAdminNotifications(){
+  // يمكن تنفيذ هذا الجزء حسب الحاجة
+}
+window.renderAdminNotifications = async () => {
+  // يمكن تنفيذ هذا الجزء حسب الحاجة
+}
+
+// ---------- دخول المدير والمكتبي مبدئياً (بتهيئة قياسية) ----------
+window.loginAdmin = async () => {
+  const pass = document.getElementById('adminPass').value.trim();
+  // افتراض: مجموعة 'admins' تحتوي مستند واحد مع حقل password
+  try {
+    const snap = await getDocs(collection(db,'admins'));
+    if(!snap.empty && snap.docs[0].data().password === pass){
+      openPage('adminPage'); 
+      renderPendingStudents(); 
+      renderAcceptedStudents(); 
+      renderNewsAdmin();
+    } else {
+      document.getElementById('adminMsg').innerText = 'كلمة مرور خاطئة';
+    }
+  } catch (error) {
+    console.error('Error logging in as admin:', error);
+    document.getElementById('adminMsg').innerText = 'حدث خطأ أثناء تسجيل الدخول';
+  }
+}
+
+window.loginLibrarian = async () => {
+  const pass = document.getElementById('libPass').value.trim();
+  try {
+    const snap = await getDocs(collection(db,'librarians'));
+    if(!snap.empty && snap.docs[0].data().password === pass){
+      openPage('librarianPage'); 
+      renderBooksLibrary(); 
+      renderRequests(); 
+      renderAdminNotifications();
+    } else {
+      document.getElementById('libMsg').innerText = 'كلمة مرور خاطئة';
+    }
+  } catch (error) {
+    console.error('Error logging in as librarian:', error);
+    document.getElementById('libMsg').innerText = 'حدث خطأ أثناء تسجيل الدخول';
+  }
+}
+
+// initialize views once
+renderNews(); 
+renderNewsAdmin(); 
+renderBooksLibrary(); 
+renderBooks(); 
+renderPendingStudents(); 
+renderAcceptedStudents(); 
+renderRequests();
+
+</script>
+</body>
+</html>
