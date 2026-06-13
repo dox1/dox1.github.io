@@ -1,0 +1,4239 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar" class="dark-theme">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fraud watch</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-dark: #0a1929;
+            --secondary-dark: #1a2536;
+            --accent-red: #ff4757;
+            --accent-orange: #ffa502;
+            --accent-green: #2ed573;
+            --accent-blue: #1e90ff;
+            --accent-purple: #9c88ff;
+            --accent-gold: #ffd700;
+            --text-primary: #ffffff;
+            --text-secondary: #bdc3c7;
+            --text-muted: #7f8c8d;
+            --border-color: #2c3e50;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+            --info: #0984e3;
+            --border-radius: 16px;
+            --border-radius-sm: 8px;
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.15);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.25);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.3);
+            --sidebar-width: 280px;
+            --header-height: 80px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient-primary: linear-gradient(135deg, #0a1929 0%, #1a2536 100%);
+            --gradient-accent: linear-gradient(135deg, #1e90ff 0%, #9c88ff 100%);
+            --gradient-gold: linear-gradient(135deg, #ffd700 0%, #ff9500 100%);
+            --gradient-premium: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--gradient-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-size: 16px;
+            line-height: 1.6;
+            touch-action: manipulation;
+        }
+
+        /* ===== AUTHENTICATION MODAL ===== */
+        .auth-modal {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: rgba(10, 25, 41, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .auth-modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .auth-container {
+            background: rgba(26, 37, 54, 0.95);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideUp 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+        }
+
+        .auth-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 1rem;
+        }
+
+        .auth-tab {
+            flex: 1;
+            text-align: center;
+            padding: 1rem;
+            cursor: pointer;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .auth-tab.active {
+            background: rgba(30, 144, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: var(--transition);
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(30, 144, 255, 0.1);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .forgot-password {
+            color: var(--accent-blue);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .auth-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient-accent);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 144, 255, 0.3);
+        }
+
+        .auth-divider {
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .auth-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            left: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-divider span {
+            background: var(--secondary-dark);
+            padding: 0 1rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-btn {
+            padding: 0.8rem;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .auth-footer a {
+            color: var(--accent-blue);
+            text-decoration: none;
+        }
+
+        /* ===== ENHANCED HEADER ===== */
+        .main-header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: var(--header-height);
+            background: rgba(26, 37, 54, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 1.5rem;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .brand-text h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #1e90ff, #9c88ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.2rem;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* ===== SUBSCRIPTION BADGE ===== */
+        .subscription-badge {
+            padding: 0.5rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .subscription-premium {
+            background: var(--gradient-gold);
+            color: #000;
+            animation: glow 2s infinite;
+        }
+
+        .subscription-basic {
+            background: rgba(30, 144, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .user-profile:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .avatar-badge {
+            position: absolute;
+            bottom: -2px;
+            left: -2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            border: 2px solid var(--secondary-dark);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            color: white;
+        }
+
+        /* ===== PREMIUM FEATURES ===== */
+        .premium-feature {
+            position: relative;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+
+        .premium-feature::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            bottom: -2px;
+            left: -2px;
+            background: var(--gradient-gold);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0.3;
+            animation: borderGlow 3s infinite;
+        }
+
+        .premium-label {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--gradient-gold);
+            color: #000;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* ===== DASHBOARD OVERVIEW ===== */
+        .dashboard-overview {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(26, 37, 54, 0.7);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(30, 144, 255, 0.3);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-accent);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: rgba(30, 144, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+            color: var(--accent-blue);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #1e90ff, #9c88ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .trend-up {
+            color: var(--accent-green);
+        }
+
+        .trend-down {
+            color: var(--accent-red);
+        }
+
+        /* ===== ENHANCED UPLOAD ===== */
+        .upload-section {
+            background: rgba(26, 37, 54, 0.8);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-md);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-section:hover {
+            border-color: var(--accent-blue);
+            background: rgba(26, 37, 54, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .upload-section.premium-feature::before {
+            animation: borderGlow 3s infinite;
+        }
+
+        .upload-progress {
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* ===== ENHANCED BUTTONS ===== */
+        .btn {
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--border-radius-sm);
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--gradient-accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 144, 255, 0.3);
+        }
+
+        .btn-success {
+            background: var(--gradient-accent);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 213, 115, 0.3);
+        }
+
+        .btn-gold {
+            background: var(--gradient-gold);
+            color: #000;
+            font-weight: 700;
+        }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .btn-premium {
+            background: var(--gradient-premium);
+            color: white;
+            animation: pulseGlow 2s infinite;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+        }
+
+        @keyframes borderGlow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(102, 126, 234, 0.8); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutLeft {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+        }
+
+        /* ===== DASHBOARD CONTAINER ===== */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            top: var(--header-height);
+            right: 0;
+            width: 70px;
+            height: calc(100vh - var(--header-height));
+            background: rgba(26, 37, 54, 0.9);
+            backdrop-filter: blur(20px);
+            padding: 1rem 0;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 999;
+            transition: var(--transition);
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            margin: 0.3rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            border-right: 4px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: linear-gradient(90deg, rgba(30, 144, 255, 0.1) 0%, transparent 100%);
+            border-right: 4px solid var(--accent-blue);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(30, 144, 255, 0.2) 0%, transparent 100%);
+            border-right: 4px solid var(--accent-blue);
+        }
+
+        .nav-item i {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-badge {
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            background: var(--accent-red);
+            color: white;
+            font-size: 0.6rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+        }
+
+        /* ===== MAIN CONTENT AREA ===== */
+        .main-content {
+            flex: 1;
+            margin-top: var(--header-height);
+            margin-right: 70px;
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .page-header {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, #1e90ff, #9c88ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.3rem;
+        }
+
+        .header-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+        }
+
+        .header-actions .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* ===== PAGE CONTENT ===== */
+        .page-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page-content.active {
+            display: block;
+        }
+
+        /* ===== UPLOAD ENHANCED SECTION ===== */
+        .upload-zone {
+            text-align: center;
+            cursor: pointer;
+            padding: 2rem 1rem;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .upload-zone.drag-over {
+            background: rgba(30, 144, 255, 0.1);
+            border-color: var(--accent-blue);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--accent-blue);
+            margin-bottom: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .upload-text h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .upload-text p {
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+            font-size: 1rem;
+        }
+
+        .file-types {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-top: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .file-type-badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .file-type-badge i {
+            margin-left: 0.5rem;
+            color: var(--accent-blue);
+        }
+
+        /* ===== ACTIVITY LIST ===== */
+        .recent-activity {
+            background: rgba(26, 37, 54, 0.8);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .recent-activity h3 {
+            margin-bottom: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+        }
+
+        .activity-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .activity-icon {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            background: rgba(30, 144, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-blue);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .activity-time {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        /* ===== FORGERY DETECTION PAGE ===== */
+        .forgery-detection {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .upload-comparison {
+            background: rgba(26, 37, 54, 0.8);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .comparison-results {
+            background: rgba(26, 37, 54, 0.8);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .signature-preview {
+            width: 100%;
+            height: 200px;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            margin-top: 1rem;
+        }
+
+        .signature-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: var(--border-radius-sm);
+        }
+
+        /* ===== VIRTUAL LAWYER PAGE ===== */
+        .virtual-lawyer {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .chat-container {
+            background: rgba(26, 37, 54, 0.8);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .message {
+            padding: 0.8rem 1rem;
+            border-radius: var(--border-radius-sm);
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.user {
+            background: rgba(30, 144, 255, 0.2);
+            align-self: flex-start;
+            border-right: 3px solid var(--accent-blue);
+        }
+
+        .message.bot {
+            background: rgba(46, 213, 115, 0.2);
+            align-self: flex-end;
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+        }
+
+        .quick-questions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* ===== CONTRACT REVIEW PAGE ===== */
+        .contract-review {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .contract-upload {
+            background: rgba(26, 37, 54, 0.8);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .analysis-results {
+            background: rgba(26, 37, 54, 0.8);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ai-detection-meter {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .ai-meter-fill {
+            height: 100%;
+            background: var(--gradient-accent);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .human-meter-fill {
+            height: 100%;
+            background: var(--gradient-gold);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        /* ===== FRAUD DETECTION PAGE ===== */
+        .fraud-detection {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .fraud-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .fraud-category {
+            background: rgba(26, 37, 54, 0.8);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        .fraud-category:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-blue);
+        }
+
+        .fraud-tool {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--border-radius-sm);
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* ===== SUBSCRIPTION PLANS ===== */
+        .subscription-plans {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .plan-card {
+            background: rgba(26, 37, 54, 0.8);
+            border-radius: var(--border-radius);
+            padding: 1.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent-blue);
+        }
+
+        .plan-card.popular {
+            border: 2px solid var(--accent-gold);
+            transform: scale(1);
+        }
+
+        .plan-card.popular:hover {
+            transform: scale(1) translateY(-5px);
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--gradient-gold);
+            color: #000;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .plan-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, #1e90ff, #9c88ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .plan-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .plan-period {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .plan-features li {
+            padding: 0.7rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .plan-features li i {
+            color: var(--accent-green);
+        }
+
+        .plan-features li.disabled i {
+            color: var(--text-muted);
+        }
+
+        .plan-features li.disabled {
+            color: var(--text-muted);
+        }
+
+        /* ===== PAYMENT MODAL ===== */
+        .payment-modal {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: rgba(10, 25, 41, 0.95);
+            backdrop-filter: blur(20px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 1rem;
+        }
+
+        .payment-modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .payment-container {
+            background: rgba(26, 37, 54, 0.95);
+            border-radius: var(--border-radius);
+            padding: 1.8rem;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .payment-close:hover {
+            color: var(--accent-red);
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-method {
+            padding: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .payment-method:hover {
+            border-color: var(--accent-blue);
+            background: rgba(30, 144, 255, 0.05);
+        }
+
+        .payment-method.active {
+            border-color: var(--accent-green);
+            background: rgba(46, 213, 115, 0.05);
+        }
+
+        .payment-method i {
+            font-size: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .payment-method.active i {
+            color: var(--accent-green);
+        }
+
+        /* ===== NOTIFICATION STYLES ===== */
+        .notification {
+            position: fixed;
+            top: 100px;
+            left: 10px;
+            right: 10px;
+            background: rgba(30, 144, 255, 0.9);
+            color: white;
+            padding: 1rem;
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 10000;
+            backdrop-filter: blur(10px);
+            animation: slideInLeft 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .notification-icon {
+            font-size: 1.2rem;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .notification-message {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        .notification-success {
+            background: rgba(46, 213, 115, 0.9);
+        }
+
+        .notification-error {
+            background: rgba(255, 71, 87, 0.9);
+        }
+
+        .notification-warning {
+            background: rgba(255, 165, 2, 0.9);
+        }
+
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+
+        .notification-bell:hover {
+            color: var(--accent-blue);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--accent-red);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            border-radius: 10px;
+        }
+
+        /* ===== USER MENU ===== */
+        .user-menu {
+            position: fixed;
+            top: 90px;
+            left: 10px;
+            right: 10px;
+            background: rgba(26, 37, 54, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--border-radius);
+            z-index: 10001;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: slideInLeft 0.3s ease;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .menu-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .menu-items {
+            padding: 0.5rem 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.2rem;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0.5rem 0;
+        }
+
+        .menu-item.logout {
+            color: var(--accent-red);
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .loading-spinner {
+            text-align: center;
+        }
+
+        .loading-spinner .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        /* ===== ENTERPRISE CONTACT ===== */
+        .enterprise-contact {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .contact-card {
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: var(--border-radius);
+            padding: 1.8rem;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .contact-card h3 {
+            color: var(--accent-purple);
+            margin-bottom: 1rem;
+        }
+
+        .contact-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* ===== ADDITIONAL STYLES ===== */
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+        }
+
+        .user-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* ===== SCROLLBAR STYLING ===== */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(30, 144, 255, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(30, 144, 255, 0.5);
+        }
+
+        /* ===== LOADING OVERLAY STYLES ===== */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: rgba(10, 25, 41, 0.95);
+            backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* ===== RESPONSIVE DESIGN FOR TABLETS ===== */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .nav-item {
+                justify-content: flex-start;
+                padding: 1rem 1.5rem;
+            }
+            
+            .nav-item span {
+                display: inline;
+                margin-right: 1rem;
+            }
+            
+            .main-content {
+                margin-right: 200px;
+            }
+            
+            .dashboard-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header-actions {
+                flex-direction: row;
+            }
+            
+            .header-actions .btn {
+                width: auto;
+            }
+            
+            .page-header {
+                flex-direction: row;
+                align-items: center;
+            }
+            
+            .subscription-plans {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .comparison-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .payment-methods {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .social-login {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ===== RESPONSIVE DESIGN FOR DESKTOP ===== */
+        @media (min-width: 1025px) {
+            .main-header {
+                padding: 0 2.5rem;
+            }
+            
+            .logo {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.8rem;
+            }
+            
+            .tagline {
+                font-size: 0.9rem;
+                max-width: none;
+            }
+            
+            .header-controls {
+                gap: 1.5rem;
+            }
+            
+            .subscription-badge span {
+                display: inline;
+            }
+            
+            .user-info {
+                display: block;
+            }
+            
+            .user-avatar {
+                width: 45px;
+                height: 45px;
+                font-size: 1.2rem;
+            }
+            
+            .sidebar {
+                width: 280px;
+                padding: 2rem 0;
+            }
+            
+            .nav-item {
+                padding: 1rem 2rem;
+                margin: 0.5rem 0;
+                justify-content: flex-start;
+            }
+            
+            .nav-item span {
+                display: inline;
+            }
+            
+            .nav-item:hover {
+                padding-right: 2.5rem;
+            }
+            
+            .main-content {
+                margin-right: 280px;
+                padding: 2.5rem;
+            }
+            
+            .page-header {
+                flex-direction: row;
+                align-items: center;
+                margin-bottom: 2.5rem;
+            }
+            
+            .page-title {
+                font-size: 2.2rem;
+            }
+            
+            .page-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .header-actions {
+                flex-direction: row;
+                width: auto;
+            }
+            
+            .header-actions .btn {
+                width: auto;
+            }
+            
+            .dashboard-overview {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 1.5rem;
+                margin-bottom: 2.5rem;
+            }
+            
+            .stat-card {
+                padding: 1.8rem;
+            }
+            
+            .stat-value {
+                font-size: 2.5rem;
+            }
+            
+            .upload-section {
+                padding: 3rem;
+                margin-bottom: 2.5rem;
+            }
+            
+            .upload-zone {
+                padding: 3rem 2rem;
+            }
+            
+            .upload-icon {
+                font-size: 4rem;
+            }
+            
+            .upload-text h3 {
+                font-size: 1.8rem;
+            }
+            
+            .subscription-plans {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2rem;
+                margin: 3rem 0;
+            }
+            
+            .plan-card {
+                padding: 2.5rem;
+            }
+            
+            .plan-card.popular {
+                transform: scale(1.05);
+            }
+            
+            .plan-card.popular:hover {
+                transform: scale(1.05) translateY(-10px);
+            }
+            
+            .plan-price {
+                font-size: 3rem;
+            }
+            
+            .payment-methods {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .auth-container {
+                padding: 3rem;
+            }
+            
+            .social-login {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .notification,
+            .user-menu {
+                left: 20px;
+                right: auto;
+                width: 350px;
+            }
+            
+            .comparison-container {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+            
+            .fraud-categories {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* ===== TOUCH DEVICE OPTIMIZATIONS ===== */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-item:hover {
+                background: none;
+                padding-right: 2rem;
+            }
+            
+            .btn:hover,
+            .stat-card:hover,
+            .captured-image:hover,
+            .camera-btn:hover,
+            .plan-card:hover {
+                transform: none;
+            }
+            
+            .upload-section:hover {
+                transform: none;
+            }
+            
+            .btn:active,
+            .nav-item:active,
+            .captured-image:active,
+            .camera-btn:active,
+            .social-btn:active,
+            .payment-method:active {
+                opacity: 0.8;
+                transform: scale(0.98);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- AUTHENTICATION MODAL -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-container">
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">تسجيل الدخول</div>
+                <div class="auth-tab" data-tab="signup">إنشاء حساب</div>
+            </div>
+            
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">البريد الإلكتروني</label>
+                    <input type="email" id="loginEmail" placeholder="example@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">كلمة المرور</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="rememberMe">
+                        تذكرني
+                    </label>
+                    <a href="#" class="forgot-password">نسيت كلمة المرور؟</a>
+                </div>
+                
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                </button>
+                
+                <div class="auth-divider">
+                    <span>أو تسجيل الدخول باستخدام</span>
+                </div>
+                
+                <div class="social-login">
+                    <button type="button" class="social-btn">
+                        <i class="fab fa-google"></i> جوجل
+                    </button>
+                    <button type="button" class="social-btn">
+                        <i class="fab fa-microsoft"></i> مايكروسوفت
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Signup Form -->
+            <form class="auth-form" id="signupForm">
+                <div class="form-group">
+                    <label for="signupName">الاسم الكامل</label>
+                    <input type="text" id="signupName" placeholder="أحمد محمد" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupEmail">البريد الإلكتروني</label>
+                    <input type="email" id="signupEmail" placeholder="example@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupPassword">كلمة المرور</label>
+                    <input type="password" id="signupPassword" placeholder="••••••••" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="userType">نوع الحساب</label>
+                    <select id="userType" required>
+                        <option value="">اختر نوع الحساب</option>
+                        <option value="client">موكل</option>
+                        <option value="lawyer">محامي</option>
+                        <option value="admin">مسؤول</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="subscriptionPlan">خطة الاشتراك</label>
+                    <select id="subscriptionPlan" required>
+                        <option value="basic">بسيط (مجاني)</option>
+                        <option value="pro">احترافي</option>
+                        <option value="premium">مميز</option>
+                    </select>
+                </div>
+                
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="termsAgreement" required>
+                        أوافق على الشروط والأحكام
+                    </label>
+                </div>
+                
+                <button type="submit" class="auth-btn">
+                    <i class="fas fa-user-plus"></i> إنشاء حساب
+                </button>
+            </form>
+            
+            <div class="auth-footer">
+                <p>بالنقر على إنشاء حساب، فإنك توافق على <a href="#">شروط الخدمة</a> و<a href="#">سياسة الخصوصية</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- PAYMENT MODAL -->
+    <div class="payment-modal" id="paymentModal">
+        <div class="payment-container">
+            <div class="payment-header">
+                <h2>اكمال عملية الدفع</h2>
+                <button class="payment-close" id="closePayment">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="plan-summary">
+                <h3>الخطة المختارة: <span id="selectedPlanName">المميزة</span></h3>
+                <p class="plan-price" id="selectedPlanPrice">$99/شهر</p>
+            </div>
+            
+            <div class="payment-methods">
+                <div class="payment-method active" data-method="credit">
+                    <i class="fas fa-credit-card"></i>
+                    <span>بطاقة ائتمان</span>
+                </div>
+                <div class="payment-method" data-method="paypal">
+                    <i class="fab fa-paypal"></i>
+                    <span>PayPal</span>
+                </div>
+                <div class="payment-method" data-method="applepay">
+                    <i class="fab fa-apple-pay"></i>
+                    <span>Apple Pay</span>
+                </div>
+            </div>
+            
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label for="cardNumber">رقم البطاقة</label>
+                    <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="expiryDate">تاريخ الانتهاء</label>
+                        <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cvv">CVV</label>
+                        <input type="text" id="cvv" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                    <i class="fas fa-lock"></i> ادفع الآن
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div class="dashboard-container" id="mainDashboard" style="display: none;">
+        <!-- ENHANCED HEADER -->
+        <header class="main-header">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-balance-scale"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Fraud watch</h1>
+                    <div class="tagline">الذكاء الاصطناعي المتقدم للتحليل القانوني</div>
+                </div>
+            </div>
+            
+            <div class="header-controls">
+                <div class="notification-bell" id="notificationBell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </div>
+                
+                <div class="subscription-badge subscription-premium" id="upgradeBtn">
+                    <i class="fas fa-crown"></i>
+                    <span>مميز</span>
+                </div>
+                
+                <div class="user-profile" id="userMenu">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                        <div class="avatar-badge">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <div class="user-info">
+                        <h4 id="userName">أحمد المحامي</h4>
+                        <p id="userTypeBadge">الحساب المميز</p>
+                    </div>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- SIDEBAR -->
+        <nav class="sidebar">
+            <ul class="nav-menu">
+                <li class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>لوحة التحكم</span>
+                </li>
+                <li class="nav-item" data-page="forgery-detection">
+                    <i class="fas fa-fingerprint"></i>
+                    <span>كشف التزوير</span>
+                </li>
+                <li class="nav-item" data-page="virtual-lawyer">
+                    <i class="fas fa-robot"></i>
+                    <span>المحامي الافتراضي</span>
+                </li>
+                <li class="nav-item" data-page="contract-review">
+                    <i class="fas fa-file-contract"></i>
+                    <span>مراجعة العقود</span>
+                </li>
+                <li class="nav-item" data-page="fraud-detection">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>كشف الاحتيال الإلكتروني</span>
+                </li>
+                <li class="nav-item" data-page="subscription">
+                    <i class="fas fa-gem"></i>
+                    <span>خطط الاشتراك</span>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <!-- DASHBOARD PAGE -->
+            <div id="dashboard" class="page-content active">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">مرحباً بك في Fraud watch</h1>
+                        <p class="page-subtitle" id="welcomeMessage">المنصة المتقدمة للتحليل القانوني والكشف عن المخاطر</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-history"></i> السجل الزمني
+                        </button>
+                        <button class="btn btn-primary" id="quickAnalysis">
+                            <i class="fas fa-bolt"></i> تحليل سريع
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DASHBOARD OVERVIEW -->
+                <div class="dashboard-overview">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <div class="stat-value">128</div>
+                        <div class="stat-label">المستندات التي تم تحليلها</div>
+                        <div class="stat-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>12% عن الشهر الماضي</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-value">47</div>
+                        <div class="stat-label">مخاطر تم اكتشافها</div>
+                        <div class="stat-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>8% عن الشهر الماضي</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="stat-value">94%</div>
+                        <div class="stat-label">دقة التحليل</div>
+                        <div class="stat-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>3% عن الشهر الماضي</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="stat-value">$2,450</div>
+                        <div class="stat-label">قيمة المخاطر المتوقعة</div>
+                        <div class="stat-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>15% عن الشهر الماضي</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- UPLOAD SECTION -->
+                <div class="upload-section premium-feature">
+                    <div class="premium-label">
+                        <i class="fas fa-crown"></i>
+                        مميز
+                    </div>
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            <h3>ابدأ التحليل الآن</h3>
+                            <p>اسحب وأفلت ملفاتك هنا أو انقر للاختيار</p>
+                        </div>
+                        <div class="file-types">
+                            <span class="file-type-badge">
+                                <i class="fas fa-file-pdf"></i> PDF
+                            </span>
+                            <span class="file-type-badge">
+                                <i class="fas fa-file-word"></i> DOC/DOCX
+                            </span>
+                            <span class="file-type-badge">
+                                <i class="fas fa-file-alt"></i> TXT
+                            </span>
+                            <span class="file-type-badge">
+                                <i class="fas fa-file-image"></i> صور النصوص
+                            </span>
+                        </div>
+                    </div>
+                    <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png" multiple style="display: none;">
+                    
+                    <div class="upload-progress" id="uploadProgress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p id="progressText">جارٍ رفع الملفات...</p>
+                    </div>
+                </div>
+
+                <!-- RECENT ACTIVITY -->
+                <div class="recent-activity">
+                    <h3>النشاط الأخير</h3>
+                    <div class="activity-list" id="activityList">
+                        <!-- سيتم ملؤه ديناميكياً -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORGERY DETECTION PAGE -->
+            <div id="forgery-detection" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">كشف تزوير التوقيعات والمستندات</h1>
+                        <p class="page-subtitle">مقارنة ذكية بين التوقيعات والمستندات للكشف عن التزوير</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" id="clearSignatures">
+                            <i class="fas fa-trash"></i> مسح الكل
+                        </button>
+                        <button class="btn btn-primary" onclick="analyzeSignatures()">
+                            <i class="fas fa-search"></i> تحليل المقارنة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="forgery-detection">
+                    <div class="comparison-container">
+                        <div class="upload-comparison">
+                            <h3><i class="fas fa-signature"></i> التوقيع الأصلي</h3>
+                            <p>قم برفع صورة للتوقيع الأصلي للمقارنة</p>
+                            <div class="signature-preview" id="originalSignaturePreview">
+                                <i class="fas fa-upload"></i>
+                                <span>اسحب وأفلت الصورة هنا</span>
+                            </div>
+                            <input type="file" id="originalSignature" accept="image/*" style="display: none;">
+                            <button class="btn btn-secondary" onclick="document.getElementById('originalSignature').click()" style="width: 100%; margin-top: 1rem;">
+                                <i class="fas fa-upload"></i> رفع التوقيع الأصلي
+                            </button>
+                        </div>
+                        
+                        <div class="upload-comparison">
+                            <h3><i class="fas fa-file-signature"></i> التوقيع المشبوه</h3>
+                            <p>قم برفع صورة للتوقيع المشبوه للفحص</p>
+                            <div class="signature-preview" id="suspiciousSignaturePreview">
+                                <i class="fas fa-upload"></i>
+                                <span>اسحب وأفلت الصورة هنا</span>
+                            </div>
+                            <input type="file" id="suspiciousSignature" accept="image/*" style="display: none;">
+                            <button class="btn btn-secondary" onclick="document.getElementById('suspiciousSignature').click()" style="width: 100%; margin-top: 1rem;">
+                                <i class="fas fa-upload"></i> رفع التوقيع المشبوه
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-results">
+                        <h3><i class="fas fa-chart-bar"></i> نتائج المقارنة</h3>
+                        <div id="comparisonResults">
+                            <p class="text-center" style="color: var(--text-secondary);">سيظهر هنا نتائج المقارنة بعد رفع التوقيعين</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIRTUAL LAWYER PAGE -->
+            <div id="virtual-lawyer" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">المحامي الافتراضي</h1>
+                        <p class="page-subtitle">استشارات قانونية فورية مع ذكاء اصطناعي متخصص</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" id="clearChat">
+                            <i class="fas fa-trash"></i> مسح المحادثة
+                        </button>
+                        <button class="btn btn-primary" id="legalTemplates">
+                            <i class="fas fa-file-alt"></i> قوالب قانونية
+                        </button>
+                    </div>
+                </div>
+
+                <div class="virtual-lawyer">
+                    <div class="chat-container">
+                        <h3><i class="fas fa-comments"></i> دردشة قانونية</h3>
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message bot">
+                                <strong>المحامي الافتراضي:</strong> مرحباً! أنا المحامي الافتراضي. كيف يمكنني مساعدتك اليوم؟ يمكنني تقديم استشارات في:
+                                <br>• القضايا المدنية والتجارية
+                                <br>• القضايا الجنائية
+                                <br>• قضايا الأحوال الشخصية
+                                <br>• الاستشارات القانونية العامة
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input">
+                            <input type="text" id="chatInput" placeholder="اكتب سؤالك القانوني هنا..." onkeypress="handleChatInput(event)">
+                            <button class="btn btn-primary" onclick="sendMessage()">
+                                <i class="fas fa-paper-plane"></i> إرسال
+                            </button>
+                        </div>
+                        
+                        <div class="quick-questions">
+                            <button class="btn btn-secondary" onclick="askQuestion('تعرضت لعملية نصب ماذا افعل؟')">
+                                تعرضت للنصب ماذا أفعل؟
+                            </button>
+                            <button class="btn btn-secondary" onclick="askQuestion('كيف أرفع دعوى تعويض؟')">
+                                كيف أرفع دعوى تعويض؟
+                            </button>
+                            <button class="btn btn-secondary" onclick="askQuestion('ما هي حقوقي كموظف؟')">
+                                حقوقي كموظف
+                            </button>
+                            <button class="btn btn-secondary" onclick="askQuestion('كيف أنقض عقد غير عادل؟')">
+                                إلغاء عقد غير عادل
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTRACT REVIEW PAGE -->
+            <div id="contract-review" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">مراجعة العقود والكشف عن كتابة الذكاء الاصطناعي</h1>
+                        <p class="page-subtitle">فحص العقود وتحديد ما إذا كانت من كتابة الإنسان أو الذكاء الاصطناعي</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" id="viewSamples">
+                            <i class="fas fa-eye"></i> عينات عقود
+                        </button>
+                        <button class="btn btn-primary" onclick="analyzeContract()">
+                            <i class="fas fa-search"></i> فحص العقد
+                        </button>
+                    </div>
+                </div>
+
+                <div class="contract-review">
+                    <div class="contract-upload">
+                        <h3><i class="fas fa-file-upload"></i> رفع العقد للفحص</h3>
+                        <p>قم برفع العقود بصيغة PDF أو DOC أو DOCX للفحص</p>
+                        <div style="margin: 2rem 0;">
+                            <i class="fas fa-file-contract" style="font-size: 4rem; color: var(--accent-blue); opacity: 0.7;"></i>
+                        </div>
+                        <input type="file" id="contractFile" accept=".pdf,.doc,.docx,.txt" style="display: none;">
+                        <button class="btn btn-primary" onclick="document.getElementById('contractFile').click()" style="width: 100%;">
+                            <i class="fas fa-upload"></i> رفع ملف العقد
+                        </button>
+                        <p style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                            يدعم: PDF, DOC, DOCX, TXT (حتى 10MB)
+                        </p>
+                    </div>
+                    
+                    <div class="analysis-results">
+                        <h3><i class="fas fa-chart-pie"></i> نتائج التحليل</h3>
+                        <div id="contractAnalysisResults">
+                            <div class="ai-detection-result">
+                                <h4>نسبة كتابة الذكاء الاصطناعي:</h4>
+                                <div class="ai-detection-meter">
+                                    <div class="ai-meter-fill" id="aiMeter"></div>
+                                </div>
+                                <p id="aiPercentage">0%</p>
+                                
+                                <h4 style="margin-top: 1.5rem;">نسبة كتابة الإنسان:</h4>
+                                <div class="ai-detection-meter">
+                                    <div class="human-meter-fill" id="humanMeter"></div>
+                                </div>
+                                <p id="humanPercentage">0%</p>
+                            </div>
+                            
+                            <div class="analysis-details" id="analysisDetails" style="margin-top: 2rem; display: none;">
+                                <h4>تفاصيل التحليل:</h4>
+                                <div id="analysisText"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FRAUD DETECTION PAGE -->
+            <div id="fraud-detection" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">كشف الاحتيال الإلكتروني</h1>
+                        <p class="page-subtitle">أدوات متقدمة للكشف عن محاولات الاحتيال الإلكتروني</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" id="fraudHistory">
+                            <i class="fas fa-history"></i> سجل الفحوصات
+                        </button>
+                        <button class="btn btn-primary" id="fraudReport">
+                            <i class="fas fa-file-export"></i> تصدير تقرير
+                        </button>
+                    </div>
+                </div>
+
+                <div class="fraud-detection">
+                    <div class="fraud-categories">
+                        <div class="fraud-category">
+                            <h3><i class="fas fa-envelope"></i> تحليل الرسائل المشبوهة</h3>
+                            <p>فحص الرسائل النصية والبريد الإلكتروني المشبوه</p>
+                            <div class="fraud-tool">
+                                <div class="form-group">
+                                    <label>أدخل نص الرسالة المشبوهة:</label>
+                                    <textarea id="suspiciousMessage" rows="4" placeholder="انسخ ولصق نص الرسالة المشبوهة هنا..."></textarea>
+                                </div>
+                                <button class="btn btn-primary" onclick="analyzeSuspiciousMessage()" style="width: 100%;">
+                                    <i class="fas fa-search"></i> تحليل الرسالة
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="fraud-category">
+                            <h3><i class="fas fa-mail-bulk"></i> تقييم مخاطر البريد الإلكتروني</h3>
+                            <p>فحص عناوين البريد الإلكتروني المشبوهة</p>
+                            <div class="fraud-tool">
+                                <div class="form-group">
+                                    <label>أدخل عنوان البريد الإلكتروني:</label>
+                                    <input type="email" id="suspiciousEmail" placeholder="example@suspicious.com">
+                                </div>
+                                <button class="btn btn-primary" onclick="analyzeEmail()" style="width: 100%;">
+                                    <i class="fas fa-shield-alt"></i> فحص البريد الإلكتروني
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="fraud-category">
+                            <h3><i class="fas fa-link"></i> فحص الروابط والمواقع</h3>
+                            <p>فحص الروابط المشبوهة والمواقع الاحتيالية</p>
+                            <div class="fraud-tool">
+                                <div class="form-group">
+                                    <label>أدخل الرابط المشبوه:</label>
+                                    <input type="url" id="suspiciousLink" placeholder="https://example.com">
+                                </div>
+                                <button class="btn btn-primary" onclick="analyzeLink()" style="width: 100%;">
+                                    <i class="fas fa-external-link-alt"></i> فحص الرابط
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="fraud-results" style="background: rgba(26, 37, 54, 0.8); border-radius: var(--border-radius); padding: 1.5rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+                        <h3><i class="fas fa-chart-line"></i> نتائج الفحص</h3>
+                        <div id="fraudResults">
+                            <p class="text-center" style="color: var(--text-secondary);">ستظهر هنا نتائج فحص الاحتيال الإلكتروني</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBSCRIPTION PAGE -->
+            <div id="subscription" class="page-content" style="display: none;">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">خطط الاشتراك</h1>
+                        <p class="page-subtitle">اختر الخطة المناسبة لاحتياجاتك واستمتع بميزات حصرية</p>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-secondary" id="viewInvoices">
+                            <i class="fas fa-file-invoice"></i> الفواتير السابقة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="subscription-plans">
+                    <!-- Basic Plan -->
+                    <div class="plan-card">
+                        <div class="plan-header">
+                            <h3 class="plan-name">بسيط</h3>
+                            <div class="plan-price">مجاني</div>
+                            <div class="plan-period">مدى الحياة</div>
+                        </div>
+                        
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> تحليل 5 مستندات شهرياً</li>
+                            <li><i class="fas fa-check"></i> تقارير أساسية</li>
+                            <li><i class="fas fa-check"></i> دعم عبر البريد الإلكتروني</li>
+                            <li class="disabled"><i class="fas fa-times"></i> التصوير المباشر</li>
+                            <li class="disabled"><i class="fas fa-times"></i> مقارنة العقود</li>
+                            <li class="disabled"><i class="fas fa-times"></i> تقارير متقدمة</li>
+                        </ul>
+                        
+                        <button class="btn btn-secondary" style="width: 100%;" data-plan="basic">
+                            الخطة الحالية
+                        </button>
+                    </div>
+
+                    <!-- Pro Plan -->
+                    <div class="plan-card popular">
+                        <div class="plan-badge">الأكثر شيوعاً</div>
+                        <div class="plan-header">
+                            <h3 class="plan-name">احترافي</h3>
+                            <div class="plan-price">$49</div>
+                            <div class="plan-period">شهرياً</div>
+                        </div>
+                        
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> تحليل 50 مستند شهرياً</li>
+                            <li><i class="fas fa-check"></i> تقارير مفصلة</li>
+                            <li><i class="fas fa-check"></i> دعم فوري</li>
+                            <li><i class="fas fa-check"></i> التصوير المباشر</li>
+                            <li><i class="fas fa-check"></i> مقارنة العقود</li>
+                            <li class="disabled"><i class="fas fa-times"></i> تقارير متقدمة</li>
+                        </ul>
+                        
+                        <button class="btn btn-primary" style="width: 100%;" data-plan="pro">
+                            <i class="fas fa-rocket"></i> ترقية الآن
+                        </button>
+                    </div>
+
+                    <!-- Premium Plan -->
+                    <div class="plan-card premium-feature">
+                        <div class="plan-header">
+                            <h3 class="plan-name">مميز</h3>
+                            <div class="plan-price">$99</div>
+                            <div class="plan-period">شهرياً</div>
+                        </div>
+                        
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i> تحليل مستندات غير محدود</li>
+                            <li><i class="fas fa-check"></i> تقارير متقدمة مع توصيات</li>
+                            <li><i class="fas fa-check"></i> دعم أولوية 24/7</li>
+                            <li><i class="fas fa-check"></i> جميع ميزات التصوير</li>
+                            <li><i class="fas fa-check"></i> مقارنة عقود متقدمة</li>
+                            <li><i class="fas fa-check"></i> تقارير PDF قابلة للتخصيص</li>
+                        </ul>
+                        
+                        <button class="btn btn-gold" style="width: 100%;" data-plan="premium">
+                            <i class="fas fa-crown"></i> الخطة المميزة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Enterprise Contact -->
+                <div class="enterprise-contact">
+                    <div class="contact-card">
+                        <h3><i class="fas fa-building"></i> خطة المؤسسات</h3>
+                        <p>تقدم خطة المؤسسات حلولاً مخصصة للشركات الكبيرة والمؤسسات الحكومية</p>
+                        <button class="btn btn-premium" id="contactEnterprise">
+                            <i class="fas fa-headset"></i> اتصل بفريق المبيعات
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ===== بيانات التطبيق =====
+        const AppState = {
+            currentUser: null,
+            isAuthenticated: false,
+            userType: null,
+            subscriptionPlan: 'basic',
+            cameraActive: false,
+            currentStream: null,
+            capturedImages: [],
+            adminCredentials: {
+                email: 'admin@legalfraud.ai',
+                password: 'Admin@123'
+            },
+            userStats: null,
+            uploadedSignatures: {
+                original: null,
+                suspicious: null
+            },
+            chatHistory: []
+        };
+
+        // خطط الاشتراك
+        const SubscriptionPlans = {
+            basic: {
+                name: 'بسيط',
+                price: 0,
+                features: ['تحليل 5 مستندات شهرياً', 'تقارير أساسية', 'دعم عبر البريد الإلكتروني'],
+                limitations: ['التصوير المباشر', 'مقارنة العقود', 'تقارير متقدمة']
+            },
+            pro: {
+                name: 'احترافي',
+                price: 49,
+                features: ['تحليل 50 مستند شهرياً', 'تقارير مفصلة', 'دعم فوري', 'التصوير المباشر', 'مقارنة العقود'],
+                limitations: ['تقارير متقدمة']
+            },
+            premium: {
+                name: 'مميز',
+                price: 99,
+                features: ['تحليل مستندات غير محدود', 'تقارير متقدمة مع توصيات', 'دعم أولوية 24/7', 'جميع الميزات'],
+                limitations: []
+            }
+        };
+
+        // قواعد بيانات للاستشارات القانونية
+        const LegalResponses = {
+            "نصب": {
+                question: "تعرضت لعملية نصب ماذا افعل؟",
+                response: `بناءً على نظام مكافحة جرائم الاحتيال المالي، إليك الخطوات الواجب اتخاذها:
+1. جمع الأدلة: احتفظ بجميع المراسلات، سجلات التحويلات، الشهادات البنكية، الشهادات الطبية إن وجدت.
+2. تقديم بلاغ: توجه إلى أقرب مركز شرطة أو نيابة مع الأدلة المجمعة.
+3. التواصل مع البنك: إذا كان النصب عن طريق تحويل بنكي، اتصل بالبنك فوراً لإيقاف التحويل إذا كان ذلك ممكناً.
+4. الاستعانة بمحامٍ: يُنصح بالاستعانة بمحامٍ متخصص في الجرائم المالية.
+5. حفظ الحقوق: يمكنك المطالبة بالتعويض المدني بالإضافة إلى العقوبة الجنائية.
+
+تذكر: السرعة في الإبلاغ تزيد من فرص استرداد الأموال ومعاقبة الجناة.`
+            },
+            "تعويض": {
+                question: "كيف أرفع دعوى تعويض؟",
+                response: `لرفع دعوى تعويض، اتبع الخطوات التالية:
+1. تحديد أساس المطالبة: تحديد إذا كانت المطالبة تعاقدية أو تقصيرية.
+2. تقديم إنذار: إرسال إنذار رسمي للطرف الآخر قبل رفع الدعوى.
+3. تجميع الأدلة: جمع جميع الوثائق والإثباتات المؤيدة للمطالبة.
+4. تحديد قيمة التعويض: حساب الأضرار المادية والمعنوية بدقة.
+5. رفع الدعوى: تقديم عريضة الدعوى إلى المحكمة المختصة.
+6. الاستعانة بمحامٍ: يُنصح بتوكيل محامٍ مختص في دعاوى التعويض.
+
+ملاحظة: مدة التقادم تختلف حسب نوع الدعوى (3 سنوات للتعويض التقصيري).`
+            },
+            "حقوق موظف": {
+                question: "ما هي حقوقي كموظف؟",
+                response: `حقوقك كموظف تشمل:
+1. الحق في أجر عادل ومكافأة نهاية الخدمة.
+2. الحق في إجازة سنوية مدفوعة الأجر (21 يوم على الأقل).
+3. الحق في إجازة مرضية حسب المدة المنصوص عليها.
+4. الحق في بيئة عمل آمنة وصحية.
+5. الحق في عدم التمييز.
+6. الحق في إنهاء العقد مع التعويض إذا كان الإنهاء تعسفياً.
+7. الحق في الحصول على شهادة خبرة عند انتهاء الخدمة.
+
+للشكوى: يمكنك التوجه إلى مكتب العمل أو رفع دعوى في المحكمة العمالية.`
+            },
+            "إلغاء عقد": {
+                question: "كيف أنقض عقد غير عادل؟",
+                response: `لإلغاء عقد غير عادل، يجب إثبات أحد الأسباب التالية:
+1. الغبن الفاحش: إذا كان العقد فيه غبن يزيد على 7/1 في المعقود عليه.
+2. التدليس: إذا وقع الغش من أحد الطرفين.
+3. الإكراه: إذا تم إبرام العقد تحت التهديد.
+4. الاستغلال: استغلال حاجة الطرف الآخر أو ضعف عقله.
+5. مخالفة النظام العام أو الآداب.
+
+الخطوات:
+1. إرسال إنذار بالإلغاء.
+2. رفع دعوى إلغاء في المحكمة المختصة.
+3. تقديم الأدلة على سبب الإلغاء.
+
+ملاحظة: دعوى الإلغاء تسقط بالتقادم بعد سنة من اكتشاف السبب.`
+            }
+        };
+
+        // ===== دوال التحميل المحسنة =====
+        function showLoading(message = 'جارٍ التحميل...') {
+            hideLoading();
+            
+            const loading = document.createElement('div');
+            loading.id = 'loadingOverlay';
+            loading.innerHTML = `
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <p>${message}</p>
+                </div>
+            `;
+            
+            loading.style.cssText = `
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                background: rgba(10, 25, 41, 0.95);
+                backdrop-filter: blur(20px);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 100000;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            document.body.appendChild(loading);
+            
+            setTimeout(() => {
+                hideLoading();
+            }, 10000);
+        }
+
+        function hideLoading() {
+            const loading = document.getElementById('loadingOverlay');
+            if (loading) {
+                loading.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => {
+                    if (loading.parentNode) {
+                        loading.parentNode.removeChild(loading);
+                    }
+                }, 300);
+            }
+        }
+
+        // ===== دوال الإشعارات =====
+        function showNotification(type, title, message) {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <div class="notification-icon">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                </div>
+                <div class="notification-content">
+                    <div class="notification-title">${title}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <div class="notification-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOutLeft 0.3s ease';
+                    setTimeout(() => notification.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // ===== دوال المصادقة الكاملة =====
+        function initAuth() {
+            const savedUser = localStorage.getItem('legalFraudUser');
+            if (savedUser) {
+                try {
+                    AppState.currentUser = JSON.parse(savedUser);
+                    AppState.isAuthenticated = true;
+                    AppState.userType = AppState.currentUser.type;
+                    AppState.subscriptionPlan = AppState.currentUser.subscriptionPlan || 'basic';
+                    
+                    showDashboard();
+                    updateUIForUser();
+                    loadUserData();
+                } catch (error) {
+                    localStorage.removeItem('legalFraudUser');
+                    showAuthModal();
+                }
+            } else {
+                showAuthModal();
+            }
+
+            // إعداد استماع النماذج
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+            
+            if (signupForm) {
+                signupForm.addEventListener('submit', handleSignup);
+            }
+            
+            // تبديل النماذج
+            document.querySelectorAll('.auth-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    
+                    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    document.querySelectorAll('.auth-form').forEach(form => {
+                        form.classList.remove('active');
+                    });
+                    
+                    const targetForm = document.getElementById(tabId + 'Form');
+                    if (targetForm) {
+                        targetForm.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const rememberMe = document.getElementById('rememberMe')?.checked || false;
+            
+            if (!email || !password) {
+                showNotification('error', 'خطأ', 'يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            showLoading('جارٍ تسجيل الدخول...');
+            
+            setTimeout(() => {
+                try {
+                    // التحقق من بيانات المسؤول
+                    if (email === AppState.adminCredentials.email && password === AppState.adminCredentials.password) {
+                        const adminUser = {
+                            name: 'المسؤول العام',
+                            email: email,
+                            type: 'admin',
+                            subscriptionPlan: 'premium',
+                            joinDate: new Date().toISOString()
+                        };
+                        
+                        saveUserAndLogin(adminUser, rememberMe);
+                        return;
+                    }
+                    
+                    // محاكاة تسجيل الدخول العادي
+                    const user = {
+                        name: email.split('@')[0],
+                        email: email,
+                        type: 'lawyer',
+                        subscriptionPlan: 'basic',
+                        joinDate: new Date().toISOString()
+                    };
+                    
+                    saveUserAndLogin(user, rememberMe);
+                } catch (error) {
+                    showNotification('error', 'خطأ', 'حدث خطأ أثناء تسجيل الدخول');
+                } finally {
+                    hideLoading();
+                }
+            }, 1500);
+        }
+
+        function handleSignup(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const type = document.getElementById('userType').value;
+            const plan = document.getElementById('subscriptionPlan').value;
+            const termsAgreement = document.getElementById('termsAgreement')?.checked || false;
+            
+            if (!name || !email || !password || !type || !plan) {
+                showNotification('error', 'خطأ', 'يرجى ملء جميع الحقول');
+                return;
+            }
+            
+            if (!termsAgreement) {
+                showNotification('error', 'خطأ', 'يجب الموافقة على الشروط والأحكام');
+                return;
+            }
+            
+            showLoading('جارٍ إنشاء حسابك...');
+            
+            setTimeout(() => {
+                try {
+                    const user = {
+                        name: name,
+                        email: email,
+                        type: type,
+                        subscriptionPlan: plan,
+                        joinDate: new Date().toISOString()
+                    };
+                    
+                    saveUserAndLogin(user, true);
+                    
+                    // إذا كانت خطة مدفوعة، عرض نموذج الدفع
+                    if (plan !== 'basic') {
+                        setTimeout(() => {
+                            showPaymentModal(plan);
+                        }, 1000);
+                    }
+                } catch (error) {
+                    showNotification('error', 'خطأ', 'حدث خطأ أثناء إنشاء الحساب');
+                } finally {
+                    hideLoading();
+                }
+            }, 1500);
+        }
+
+        function saveUserAndLogin(user, remember) {
+            AppState.currentUser = user;
+            AppState.isAuthenticated = true;
+            AppState.userType = user.type;
+            AppState.subscriptionPlan = user.subscriptionPlan || 'basic';
+            
+            if (remember) {
+                localStorage.setItem('legalFraudUser', JSON.stringify(user));
+            }
+            
+            showNotification('success', 'تم تسجيل الدخول بنجاح', `مرحباً ${user.name}`);
+            showDashboard();
+            updateUIForUser();
+            loadUserData();
+        }
+
+        function showDashboard() {
+            const authModal = document.getElementById('authModal');
+            const mainDashboard = document.getElementById('mainDashboard');
+            
+            if (authModal) {
+                authModal.classList.add('hidden');
+            }
+            
+            if (mainDashboard) {
+                mainDashboard.style.display = 'flex';
+            }
+            
+            setTimeout(() => {
+                if (authModal) {
+                    authModal.style.display = 'none';
+                }
+            }, 500);
+        }
+
+        function showAuthModal() {
+            const authModal = document.getElementById('authModal');
+            if (authModal) {
+                authModal.style.display = 'flex';
+                setTimeout(() => {
+                    authModal.classList.remove('hidden');
+                }, 10);
+            }
+        }
+
+        function loadUserData() {
+            if (!AppState.currentUser) return;
+            
+            showLoading('جارٍ تحميل بياناتك...');
+            
+            setTimeout(() => {
+                try {
+                    updateDashboardStats();
+                    updateActivityLog();
+                    updateSubscriptionPage();
+                } catch (error) {
+                    console.error('Error loading user data:', error);
+                } finally {
+                    hideLoading();
+                }
+            }, 1000);
+        }
+
+        function updateDashboardStats() {
+            const stats = {
+                documentsAnalyzed: Math.floor(Math.random() * 200) + 100,
+                risksDetected: Math.floor(Math.random() * 100) + 20,
+                accuracy: Math.floor(Math.random() * 10) + 90,
+                avgTime: (Math.random() * 2 + 1.5).toFixed(1),
+                moneySaved: Math.floor(Math.random() * 10000) + 5000
+            };
+            
+            const statValues = document.querySelectorAll('.stat-value');
+            if (statValues.length >= 4) {
+                statValues[0].textContent = stats.documentsAnalyzed;
+                statValues[1].textContent = stats.risksDetected;
+                statValues[2].textContent = stats.accuracy + '%';
+                statValues[3].textContent = '$' + stats.moneySaved;
+            }
+            
+            AppState.userStats = stats;
+        }
+
+        function updateActivityLog() {
+            const activities = [
+                { type: 'analysis', text: 'تم تحليل عقد شراكة تجارية', time: 'منذ 5 دقائق', icon: 'fa-file-contract' },
+                { type: 'upload', text: 'تم رفع 3 مستندات جديدة', time: 'منذ 30 دقيقة', icon: 'fa-cloud-upload-alt' },
+                { type: 'payment', text: 'تم تجديد الاشتراك المميز', time: 'منذ 2 ساعة', icon: 'fa-credit-card' },
+                { type: 'risk', text: 'تم اكتشاف مخاطر في عقد الإيجار', time: 'منذ 5 ساعات', icon: 'fa-exclamation-triangle' }
+            ];
+            
+            const activityList = document.getElementById('activityList');
+            if (activityList) {
+                activityList.innerHTML = activities.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="fas ${activity.icon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-text">${activity.text}</div>
+                            <div class="activity-time">${activity.time}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function updateUIForUser() {
+            if (!AppState.currentUser) return;
+            
+            const userNameElement = document.getElementById('userName');
+            const userTypeBadgeElement = document.getElementById('userTypeBadge');
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            
+            if (userNameElement) {
+                userNameElement.textContent = AppState.currentUser.name;
+            }
+            
+            if (userTypeBadgeElement) {
+                userTypeBadgeElement.textContent = 
+                    AppState.userType === 'admin' ? 'المسؤول' : 
+                    `الحساب ${SubscriptionPlans[AppState.subscriptionPlan]?.name || 'بسيط'}`;
+            }
+            
+            if (welcomeMessage) {
+                welcomeMessage.textContent = 
+                    `مرحباً ${AppState.currentUser.name} في المنصة المتقدمة للتحليل القانوني`;
+            }
+            
+            updateSubscriptionBadge();
+            updatePremiumFeatures();
+        }
+
+        function updateSubscriptionBadge() {
+            const upgradeBtn = document.getElementById('upgradeBtn');
+            if (!upgradeBtn) return;
+            
+            if (AppState.subscriptionPlan === 'premium') {
+                upgradeBtn.innerHTML = '<i class="fas fa-crown"></i><span>مميز</span>';
+                upgradeBtn.className = 'subscription-badge subscription-premium';
+            } else if (AppState.subscriptionPlan === 'pro') {
+                upgradeBtn.innerHTML = '<i class="fas fa-rocket"></i><span>احترافي</span>';
+                upgradeBtn.className = 'subscription-badge';
+                upgradeBtn.style.background = 'var(--gradient-accent)';
+            } else {
+                upgradeBtn.innerHTML = '<i class="fas fa-star"></i><span>ترقية</span>';
+                upgradeBtn.className = 'subscription-badge subscription-basic';
+            }
+        }
+
+        function updatePremiumFeatures() {
+            const isPremium = AppState.subscriptionPlan === 'premium' || AppState.subscriptionPlan === 'pro';
+            
+            document.querySelectorAll('.premium-feature').forEach(feature => {
+                if (!isPremium) {
+                    feature.style.opacity = '0.6';
+                    feature.style.pointerEvents = 'none';
+                } else {
+                    feature.style.opacity = '1';
+                    feature.style.pointerEvents = 'auto';
+                }
+            });
+        }
+
+        // ===== دوال التنقل =====
+        function initEventListeners() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const pageId = this.dataset.page;
+                    
+                    // التحقق من صلاحيات الوصول للميزات المميزة
+                    if ((pageId === 'forgery-detection' || pageId === 'contract-review') && 
+                        AppState.subscriptionPlan === 'basic') {
+                        showNotification('warning', 'ميزة مميزة', 'هذه الميزة متاحة فقط لمشتركي الخطة الاحترافية والمميزة');
+                        showPaymentModal('pro');
+                        return;
+                    }
+                    
+                    navigateToPage(pageId);
+                });
+            });
+            
+            // زر الترقية
+            const upgradeBtn = document.getElementById('upgradeBtn');
+            if (upgradeBtn) {
+                upgradeBtn.addEventListener('click', function() {
+                    navigateToPage('subscription');
+                });
+            }
+            
+            // زر التحليل السريع
+            const quickAnalysisBtn = document.getElementById('quickAnalysis');
+            if (quickAnalysisBtn) {
+                quickAnalysisBtn.addEventListener('click', function() {
+                    const fileInput = document.getElementById('fileInput');
+                    if (fileInput) {
+                        fileInput.click();
+                    }
+                });
+            }
+            
+            // رفع الملفات
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) {
+                fileInput.addEventListener('change', handleFileUpload);
+            }
+            
+            // إعداد السحب والإفلات
+            setupDragAndDrop();
+            
+            // إشعارات
+            const notificationBell = document.getElementById('notificationBell');
+            if (notificationBell) {
+                notificationBell.addEventListener('click', showNotifications);
+            }
+            
+            // قائمة المستخدم
+            const userMenuBtn = document.getElementById('userMenu');
+            if (userMenuBtn) {
+                userMenuBtn.addEventListener('click', showUserMenu);
+            }
+            
+            // إعداد كشف التزوير
+            setupForgeryDetection();
+            
+            // إعداد المحامي الافتراضي
+            setupVirtualLawyer();
+            
+            // إعداد مراجعة العقود
+            setupContractReview();
+            
+            // إعداد كشف الاحتيال
+            setupFraudDetection();
+        }
+
+        function navigateToPage(pageId) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            const activeNavItem = document.querySelector(`[data-page="${pageId}"]`);
+            if (activeNavItem) {
+                activeNavItem.classList.add('active');
+            }
+            
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.style.display = 'none';
+                page.classList.remove('active');
+            });
+            
+            const targetPage = document.getElementById(pageId);
+            if (targetPage) {
+                targetPage.style.display = 'block';
+                setTimeout(() => {
+                    targetPage.classList.add('active');
+                }, 10);
+            }
+        }
+
+        // ===== دوال الرفع والسحب والإفلات =====
+        function setupDragAndDrop() {
+            const uploadZone = document.getElementById('uploadZone');
+            if (!uploadZone) return;
+            
+            uploadZone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                this.classList.add('drag-over');
+            });
+            
+            uploadZone.addEventListener('dragleave', function() {
+                this.classList.remove('drag-over');
+            });
+            
+            uploadZone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                
+                if (e.dataTransfer.files.length > 0) {
+                    const files = Array.from(e.dataTransfer.files);
+                    handleFileUpload({ target: { files: e.dataTransfer.files } });
+                }
+            });
+            
+            uploadZone.addEventListener('click', function() {
+                const fileInput = document.getElementById('fileInput');
+                if (fileInput) {
+                    fileInput.click();
+                }
+            });
+        }
+
+        function handleFileUpload(e) {
+            if (!e.target.files || e.target.files.length === 0) return;
+            
+            const files = Array.from(e.target.files);
+            
+            // التحقق من الميزات المميزة
+            let processedFiles = files;
+            if (AppState.subscriptionPlan === 'basic' && files.length > 5) {
+                showNotification('warning', 'حد الملفات', 'الخطة المجانية تسمح بتحليل 5 ملفات فقط');
+                processedFiles = files.slice(0, 5);
+            }
+            
+            showUploadProgress();
+            
+            // محاكاة رفع الملفات
+            simulateFileUpload(processedFiles);
+        }
+
+        function simulateFileUpload(files) {
+            showLoading(`جارٍ رفع ${files.length} ملف...`);
+            
+            setTimeout(() => {
+                try {
+                    analyzeUploadedFiles(files);
+                    showNotification('success', 'تم الرفع', `تم رفع ${files.length} ملف بنجاح`);
+                } catch (error) {
+                    showNotification('error', 'خطأ', 'حدث خطأ أثناء رفع الملفات');
+                } finally {
+                    hideLoading();
+                }
+            }, 2000);
+        }
+
+        function analyzeUploadedFiles(files) {
+            showNotification('info', 'جارٍ التحليل', 'يقوم الذكاء الاصطناعي بتحليل المستندات...');
+            
+            setTimeout(() => {
+                const results = {
+                    totalFiles: files.length,
+                    risksFound: Math.floor(Math.random() * files.length * 2) + 1,
+                    analysisComplete: true,
+                    recommendations: generateRecommendations(files.length)
+                };
+                
+                showNotification('success', 'اكتمل التحليل', 
+                    `تم تحليل ${results.totalFiles} ملف. تم اكتشاف ${results.risksFound} مخاطر.`);
+            }, 3000);
+        }
+
+        function generateRecommendations(fileCount) {
+            const recommendations = [
+                'تجنب الصياغة الغامضة في العقود',
+                'حدد بوضوح مسؤوليات كل طرف',
+                'أضف بنود حل النزاعات',
+                'حدد مدة العقد بوضوح',
+                'تأكد من شروط الإنهاء'
+            ];
+            
+            return recommendations.slice(0, Math.min(fileCount, recommendations.length));
+        }
+
+        function showUploadProgress() {
+            const progressDiv = document.getElementById('uploadProgress');
+            if (progressDiv) {
+                progressDiv.style.display = 'block';
+            }
+        }
+
+        function updateUploadProgress(percentage, message) {
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            if (progressFill) {
+                progressFill.style.width = percentage + '%';
+            }
+            
+            if (progressText) {
+                progressText.textContent = message;
+            }
+        }
+
+        // ===== كشف التزوير =====
+        function setupForgeryDetection() {
+            const originalInput = document.getElementById('originalSignature');
+            const suspiciousInput = document.getElementById('suspiciousSignature');
+            
+            if (originalInput) {
+                originalInput.addEventListener('change', function(e) {
+                    handleSignatureUpload(e, 'original');
+                });
+            }
+            
+            if (suspiciousInput) {
+                suspiciousInput.addEventListener('change', function(e) {
+                    handleSignatureUpload(e, 'suspicious');
+                });
+            }
+            
+            // إعداد السحب والإفلات
+            ['originalSignaturePreview', 'suspiciousSignaturePreview'].forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('dragover', function(e) {
+                        e.preventDefault();
+                        this.style.borderColor = 'var(--accent-blue)';
+                    });
+                    
+                    element.addEventListener('dragleave', function() {
+                        this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                    });
+                    
+                    element.addEventListener('drop', function(e) {
+                        e.preventDefault();
+                        this.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                        
+                        const files = e.dataTransfer.files;
+                        if (files.length > 0) {
+                            const type = id.includes('original') ? 'original' : 'suspicious';
+                            handleSignatureUpload({ target: { files: files } }, type);
+                        }
+                    });
+                }
+            });
+        }
+
+        function handleSignatureUpload(e, type) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                showNotification('error', 'خطأ', 'الملف يجب أن يكون صورة');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const previewId = type === 'original' ? 'originalSignaturePreview' : 'suspiciousSignaturePreview';
+                const preview = document.getElementById(previewId);
+                if (preview) {
+                    preview.innerHTML = `<img src="${event.target.result}" alt="التوقيع ${type === 'original' ? 'الأصلي' : 'المشبوه'}">`;
+                }
+                
+                AppState.uploadedSignatures[type] = event.target.result;
+                showNotification('success', 'تم الرفع', `تم رفع التوقيع ${type === 'original' ? 'الأصلي' : 'المشبوه'} بنجاح`);
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function analyzeSignatures() {
+            if (!AppState.uploadedSignatures.original || !AppState.uploadedSignatures.suspicious) {
+                showNotification('warning', 'تحذير', 'يرجى رفع التوقيعين أولاً');
+                return;
+            }
+            
+            showLoading('جارٍ تحليل التوقيعات والمقارنة...');
+            
+            setTimeout(() => {
+                try {
+                    const results = generateForgeryAnalysis();
+                    displayForgeryResults(results);
+                    showNotification('success', 'اكتمل التحليل', 'تم تحليل التوقيعات بنجاح');
+                } catch (error) {
+                    showNotification('error', 'خطأ', 'حدث خطأ أثناء تحليل التوقيعات');
+                } finally {
+                    hideLoading();
+                }
+            }, 3000);
+        }
+
+        function generateForgeryAnalysis() {
+            const matchPercentage = Math.floor(Math.random() * 40) + 30;
+            const isForged = matchPercentage < 65;
+            const riskLevel = isForged ? 'مرتفع' : 'منخفض';
+            
+            return {
+                matchPercentage,
+                isForged,
+                riskLevel,
+                similarities: ['تشابه في الشكل العام', 'اختلاف في ضغط القلم', 'اختلاف في زاوية الكتابة'],
+                recommendations: isForged ? [
+                    'يوصى بعرض التوقيع على خبير خطوط',
+                    'يجب استشارة محامٍ متخصص',
+                    'جمع المزيد من الأدلة والتوقيعات المقارنة'
+                ] : [
+                    'التوقيع يبدو أصلياً',
+                    'يمكن استخدامه كدليل',
+                    'يوصى بالحفاظ على الوثيقة الأصلية'
+                ]
+            };
+        }
+
+        function displayForgeryResults(results) {
+            const resultsContainer = document.getElementById('comparisonResults');
+            if (!resultsContainer) return;
+            
+            const color = results.isForged ? 'var(--accent-red)' : 'var(--accent-green)';
+            const status = results.isForged ? 'مشبوه (محتمل التزوير)' : 'أصلي';
+            
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="font-size: 3rem; color: ${color}; margin-bottom: 1rem;">
+                        ${results.matchPercentage}%
+                    </div>
+                    <div style="font-size: 1.2rem; font-weight: bold; color: ${color};">
+                        نسبة التشابه
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: var(--border-radius-sm); margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>حالة التوقيع:</span>
+                        <span style="color: ${color}; font-weight: bold;">${status}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>مستوى الخطورة:</span>
+                        <span style="color: ${results.isForged ? 'var(--accent-red)' : 'var(--accent-green)'};">${results.riskLevel}</span>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <h4>ملاحظات التحليل:</h4>
+                    <ul style="padding-right: 1.5rem; color: var(--text-secondary);">
+                        ${results.similarities.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4>التوصيات:</h4>
+                    <div style="background: rgba(30, 144, 255, 0.1); padding: 1rem; border-radius: var(--border-radius-sm); border-right: 3px solid var(--accent-blue);">
+                        ${results.recommendations.map(rec => `<div style="margin-bottom: 0.5rem;">• ${rec}</div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== المحامي الافتراضي =====
+        function setupVirtualLawyer() {
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            if (!chatInput || !chatInput.value.trim()) return;
+            
+            const message = chatInput.value.trim();
+            addMessageToChat('user', message);
+            chatInput.value = '';
+            
+            setTimeout(() => {
+                const response = generateLegalResponse(message);
+                addMessageToChat('bot', response);
+            }, 1000);
+        }
+
+        function handleChatInput(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function askQuestion(question) {
+            const chatInput = document.getElementById('chatInput');
+            if (chatInput) {
+                chatInput.value = question;
+                sendMessage();
+            }
+        }
+
+        function addMessageToChat(sender, message) {
+            const chatMessages = document.getElementById('chatMessages');
+            if (!chatMessages) return;
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${sender}`;
+            messageElement.innerHTML = `<strong>${sender === 'user' ? 'أنت' : 'المحامي الافتراضي'}:</strong> ${message}`;
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            AppState.chatHistory.push({ sender, message, timestamp: new Date() });
+        }
+
+        function generateLegalResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('نصب') || lowerMessage.includes('احتيال') || lowerMessage.includes('سرقة')) {
+                return LegalResponses['نصب'].response;
+            } else if (lowerMessage.includes('تعويض') || lowerMessage.includes('دعوى')) {
+                return LegalResponses['تعويض'].response;
+            } else if (lowerMessage.includes('موظف') || lowerMessage.includes('عمل') || lowerMessage.includes('راتب')) {
+                return LegalResponses['حقوق موظف'].response;
+            } else if (lowerMessage.includes('عقد') || lowerMessage.includes('إلغاء') || lowerMessage.includes('فسخ')) {
+                return LegalResponses['إلغاء عقد'].response;
+            } else {
+                return `شكراً لسؤالك. لفهم مشكلتك القانونية بشكل أفضل، يرجى تقديم المزيد من التفاصيل حول:
+1. نوع المشكلة (مدنية، جنائية، تجارية، أحوال شخصية)
+2. تاريخ وقوع الحادثة
+3. الأطراف المتضمنة
+4. الوثائق المتوفرة لديك
+
+يمكنك أيضاً استخدام الأسئلة السريعة للحصول على إجابات محددة.`;
+            }
+        }
+
+        // ===== مراجعة العقود =====
+        function setupContractReview() {
+            const contractFile = document.getElementById('contractFile');
+            if (contractFile) {
+                contractFile.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        showNotification('success', 'تم الرفع', `تم رفع العقد: ${file.name}`);
+                    }
+                });
+            }
+        }
+
+        function analyzeContract() {
+            const contractFile = document.getElementById('contractFile');
+            if (!contractFile || !contractFile.files[0]) {
+                showNotification('warning', 'تحذير', 'يرجى رفع ملف العقد أولاً');
+                return;
+            }
+            
+            showLoading('جارٍ تحليل العقد والكشف عن كتابة الذكاء الاصطناعي...');
+            
+            setTimeout(() => {
+                try {
+                    const results = generateContractAnalysis();
+                    displayContractResults(results);
+                    showNotification('success', 'اكتمل التحليل', 'تم تحليل العقد بنجاح');
+                } catch (error) {
+                    showNotification('error', 'خطأ', 'حدث خطأ أثناء تحليل العقد');
+                } finally {
+                    hideLoading();
+                }
+            }, 4000);
+        }
+
+        function generateContractAnalysis() {
+            const aiPercentage = Math.floor(Math.random() * 100);
+            const humanPercentage = 100 - aiPercentage;
+            const isAIGenerated = aiPercentage > 60;
+            
+            return {
+                aiPercentage,
+                humanPercentage,
+                isAIGenerated,
+                indicators: aiPercentage > 50 ? 
+                    ['التكرار في الصياغة', 'استخدام عبارات عامة', 'قلة الأخطاء الإملائية'] :
+                    ['الأخطاء الإملائية البسيطة', 'الاختلاف في أسلوب الكتابة', 'المراجع الشخصية'],
+                recommendations: isAIGenerated ? [
+                    'ينصح بمراجعة العقد من قبل محامٍ بشري',
+                    'التأكد من شروط العقد الخاصة',
+                    'طلب تعديل الصياغة لتكون أكثر تحديداً'
+                ] : [
+                    'العقد يبدو من كتابة بشرية',
+                    'ينصح بالمراجعة النهائية',
+                    'التأكد من جميع التفاصيل والشروط'
+                ]
+            };
+        }
+
+        function displayContractResults(results) {
+            const aiMeter = document.getElementById('aiMeter');
+            const humanMeter = document.getElementById('humanMeter');
+            const aiPercentage = document.getElementById('aiPercentage');
+            const humanPercentage = document.getElementById('humanPercentage');
+            const analysisDetails = document.getElementById('analysisDetails');
+            const analysisText = document.getElementById('analysisText');
+            
+            if (aiMeter) {
+                setTimeout(() => {
+                    aiMeter.style.width = `${results.aiPercentage}%`;
+                }, 100);
+            }
+            
+            if (humanMeter) {
+                setTimeout(() => {
+                    humanMeter.style.width = `${results.humanPercentage}%`;
+                }, 100);
+            }
+            
+            if (aiPercentage) {
+                aiPercentage.textContent = `${results.aiPercentage}%`;
+                aiPercentage.style.color = results.aiPercentage > 60 ? 'var(--accent-red)' : 'var(--accent-green)';
+            }
+            
+            if (humanPercentage) {
+                humanPercentage.textContent = `${results.humanPercentage}%`;
+                humanPercentage.style.color = results.humanPercentage > 60 ? 'var(--accent-green)' : 'var(--accent-blue)';
+            }
+            
+            if (analysisDetails) {
+                analysisDetails.style.display = 'block';
+            }
+            
+            if (analysisText) {
+                const verdict = results.isAIGenerated ? 
+                    '<p style="color: var(--accent-red); font-weight: bold;">✓ العقد من كتابة الذكاء الاصطناعي</p>' :
+                    '<p style="color: var(--accent-green); font-weight: bold;">✓ العقد من كتابة الإنسان</p>';
+                
+                const indicatorsHTML = `
+                    <p><strong>مؤشرات التحليل:</strong></p>
+                    <ul style="padding-right: 1.5rem; color: var(--text-secondary);">
+                        ${results.indicators.map(ind => `<li>${ind}</li>`).join('')}
+                    </ul>
+                `;
+                
+                const recommendationsHTML = `
+                    <p style="margin-top: 1rem;"><strong>التوصيات:</strong></p>
+                    <div style="background: rgba(46, 213, 115, 0.1); padding: 1rem; border-radius: var(--border-radius-sm); border-right: 3px solid var(--accent-green);">
+                        ${results.recommendations.map(rec => `<div style="margin-bottom: 0.5rem;">• ${rec}</div>`).join('')}
+                    </div>
+                `;
+                
+                analysisText.innerHTML = verdict + indicatorsHTML + recommendationsHTML;
+            }
+        }
+
+        // ===== كشف الاحتيال الإلكتروني =====
+        function setupFraudDetection() {
+            // لا حاجة لإعداد إضافي هنا
+        }
+
+        function analyzeSuspiciousMessage() {
+            const messageInput = document.getElementById('suspiciousMessage');
+            if (!messageInput || !messageInput.value.trim()) {
+                showNotification('warning', 'تحذير', 'يرجى إدخال نص الرسالة');
+                return;
+            }
+            
+            showLoading('جارٍ تحليل الرسالة المشبوهة...');
+            
+            setTimeout(() => {
+                try {
+                    const results = analyzeMessageForFraud(messageInput.value);
+                    displayFraudResults(results, 'message');
+                    showNotification('success', 'اكتمل التحليل', 'تم فحص الرسالة بنجاح');
+                } catch (error) {
+                    showNotification('error', 'خطأ', 'حدث خطأ أثناء تحليل الرسالة');
+                } finally {
+                    hideLoading();
+                }
+            }, 2000);
+        }
+
+        function analyzeEmail() {
+            const emailInput = document.getElementById('suspiciousEmail');
+            if (!emailInput || !emailInput.value.trim()) {
+                showNotification('warning', 'تحذير', 'يرجى إدخال عنوان البريد الإلكتروني');
+                return;
+            }
+            
+            showLoading('جارٍ فحص عنوان البريد الإلكتروني...');
+            
+            setTimeout(() => {
+                try {
+                    const results = analyzeEmailForFraud(emailInput.value);
+                    displayFraudResults(results, 'email');
+                    showNotification('success', 'اكتمل التحليل', 'تم فحص البريد الإلكتروني بنجاح');
+                } catch (error) {
+                    showNotification('error', 'خطأ', 'حدث خطأ أثناء فحص البريد الإلكتروني');
+                } finally {
+                    hideLoading();
+                }
+            }, 2000);
+        }
+
+        function analyzeLink() {
+            const linkInput = document.getElementById('suspiciousLink');
+            if (!linkInput || !linkInput.value.trim()) {
+                showNotification('warning', 'تحذير', 'يرجى إدخال الرابط');
+                return;
+            }
+            
+            showLoading('جارٍ فحص الرابط المشبوه...');
+            
+            setTimeout(() => {
+                try {
+                    const results = analyzeLinkForFraud(linkInput.value);
+                    displayFraudResults(results, 'link');
+                    showNotification('success', 'اكتمل التحليل', 'تم فحص الرابط بنجاح');
+                } catch (error) {
+                    showNotification('error', 'خطأ', 'حدث خطأ أثناء فحص الرابط');
+                } finally {
+                    hideLoading();
+                }
+            }, 2000);
+        }
+
+        function analyzeMessageForFraud(message) {
+            let riskScore = 0;
+            const redFlags = [];
+            const warnings = [];
+            
+            const suspiciousPatterns = [
+                { pattern: 'فوز', score: 20, warning: 'عروض الفوز بالجوائز' },
+                { pattern: 'جائزة', score: 25, warning: 'عروض الجوائز المجانية' },
+                { pattern: 'مليون', score: 30, warning: 'عروض مالية كبيرة' },
+                { pattern: 'سريع', score: 15, warning: 'طلب اتخاذ إجراء سريع' },
+                { pattern: 'فرصة', score: 20, warning: 'عروض الفرص الاستثمارية' }
+            ];
+            
+            suspiciousPatterns.forEach(pattern => {
+                if (message.toLowerCase().includes(pattern.pattern)) {
+                    riskScore += pattern.score;
+                    redFlags.push(pattern.warning);
+                }
+            });
+            
+            let riskLevel = 'منخفض';
+            if (riskScore > 60) riskLevel = 'مرتفع جداً';
+            else if (riskScore > 40) riskLevel = 'مرتفع';
+            else if (riskScore > 20) riskLevel = 'متوسط';
+            
+            return {
+                riskScore: Math.min(riskScore, 100),
+                riskLevel,
+                redFlags,
+                warnings,
+                isSuspicious: riskScore > 40,
+                recommendations: riskScore > 40 ? [
+                    'عدم الرد على الرسالة',
+                    'عدم النقر على أي روابط',
+                    'عدم مشاركة أي معلومات شخصية',
+                    'الإبلاغ عن الرسالة إذا كانت مزعجة'
+                ] : [
+                    'كن حذراً ولكن الرسالة تبدو آمنة',
+                    'تحقق من مصدر الرسالة',
+                    'لا تشارك المعلومات الحساسة'
+                ]
+            };
+        }
+
+        function analyzeEmailForFraud(email) {
+            let riskScore = 0;
+            const redFlags = [];
+            const warnings = [];
+            
+            if (email.includes('@')) {
+                const domain = email.split('@')[1];
+                if (domain) {
+                    if (domain.includes('gmai1.com') || domain.includes('gma1l.com')) {
+                        riskScore += 40;
+                        redFlags.push('نطاق يحتوي على أخطاء إملائية مشبوهة');
+                    }
+                }
+            }
+            
+            let riskLevel = 'منخفض';
+            if (riskScore > 50) riskLevel = 'مرتفع جداً';
+            else if (riskScore > 30) riskLevel = 'مرتفع';
+            else if (riskScore > 15) riskLevel = 'متوسط';
+            
+            return {
+                riskScore: Math.min(riskScore, 100),
+                riskLevel,
+                redFlags,
+                warnings,
+                isSuspicious: riskScore > 30,
+                recommendations: riskScore > 30 ? [
+                    'عدم الرد على هذا البريد',
+                    'عدم فتح المرفقات',
+                    'عدم النقر على الروابط',
+                    'الإبلاغ عن البريد كتصيد احتيالي'
+                ] : [
+                    'البريد يبدو آمناً',
+                    'تحقق دائماً من المرسل قبل الرد',
+                    'كن حذراً من المرفقات والروابط'
+                ]
+            };
+        }
+
+        function analyzeLinkForFraud(link) {
+            let riskScore = 0;
+            const redFlags = [];
+            const warnings = [];
+            
+            try {
+                const url = new URL(link);
+                
+                if (url.protocol !== 'https:') {
+                    riskScore += 30;
+                    warnings.push('الرابط لا يستخدم HTTPS');
+                }
+                
+            } catch (error) {
+                riskScore += 50;
+                redFlags.push('رابط غير صالح أو غير مكتمل');
+            }
+            
+            let riskLevel = 'منخفض';
+            if (riskScore > 60) riskLevel = 'مرتفع جداً';
+            else if (riskScore > 40) riskLevel = 'مرتفع';
+            else if (riskScore > 20) riskLevel = 'متوسط';
+            
+            return {
+                riskScore: Math.min(riskScore, 100),
+                riskLevel,
+                redFlags,
+                warnings,
+                isSuspicious: riskScore > 40,
+                recommendations: riskScore > 40 ? [
+                    'عدم النقر على الرابط',
+                    'عدم إدخال أي معلومات شخصية',
+                    'الإبلاغ عن الرابط كمحاولة تصيد',
+                    'استخدام أداة فحص الروابط قبل الزيارة'
+                ] : [
+                    'الرابط يبدو آمناً',
+                    'تحقق دائماً من شهادة SSL',
+                    'انتبه للنوافذ المنبثقة'
+                ]
+            };
+        }
+
+        function displayFraudResults(results, type) {
+            const resultsContainer = document.getElementById('fraudResults');
+            if (!resultsContainer) return;
+            
+            const typeNames = {
+                'message': 'الرسالة',
+                'email': 'البريد الإلكتروني',
+                'link': 'الرابط'
+            };
+            
+            const color = results.isSuspicious ? 'var(--accent-red)' : 'var(--accent-green)';
+            
+            resultsContainer.innerHTML = `
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div style="font-size: 2.5rem; color: ${color}; margin-bottom: 0.5rem;">
+                        ${results.riskScore}%
+                    </div>
+                    <div style="font-size: 1rem; color: var(--text-secondary);">
+                        درجة الخطورة
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: var(--border-radius-sm); margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>نوع الفحص:</span>
+                        <span style="font-weight: bold;">${typeNames[type] || type}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>مستوى الخطورة:</span>
+                        <span style="color: ${color}; font-weight: bold;">${results.riskLevel}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>الحالة:</span>
+                        <span style="color: ${results.isSuspicious ? 'var(--accent-red)' : 'var(--accent-green)'}; font-weight: bold;">
+                            ${results.isSuspicious ? 'مشبوه' : 'آمن'}
+                        </span>
+                    </div>
+                </div>
+                
+                ${results.redFlags.length > 0 ? `
+                    <div style="margin-bottom: 1rem;">
+                        <h4>علامات خطر ⚠️:</h4>
+                        <div style="background: rgba(255, 71, 87, 0.1); padding: 1rem; border-radius: var(--border-radius-sm); border-right: 3px solid var(--accent-red);">
+                            ${results.redFlags.map(flag => `<div style="margin-bottom: 0.5rem;">• ${flag}</div>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                ${results.warnings.length > 0 ? `
+                    <div style="margin-bottom: 1rem;">
+                        <h4>تحذيرات 🚨:</h4>
+                        <div style="background: rgba(255, 165, 2, 0.1); padding: 1rem; border-radius: var(--border-radius-sm); border-right: 3px solid var(--accent-orange);">
+                            ${results.warnings.map(warning => `<div style="margin-bottom: 0.5rem;">• ${warning}</div>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                
+                <div>
+                    <h4>التوصيات:</h4>
+                    <div style="background: rgba(46, 213, 115, 0.1); padding: 1rem; border-radius: var(--border-radius-sm); border-right: 3px solid var(--accent-green);">
+                        ${results.recommendations.map(rec => `<div style="margin-bottom: 0.5rem;">• ${rec}</div>`).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // ===== دوال الاشتراكات والدفع =====
+        function updateSubscriptionPage() {
+            document.querySelectorAll('[data-plan]').forEach(button => {
+                const plan = button.dataset.plan;
+                
+                if (plan === AppState.subscriptionPlan) {
+                    button.innerHTML = '<i class="fas fa-check"></i> الخطة الحالية';
+                    button.className = 'btn btn-secondary';
+                    button.disabled = true;
+                } else if (plan === 'basic') {
+                    button.innerHTML = 'الخطة الحالية';
+                    button.className = 'btn btn-secondary';
+                } else {
+                    button.innerHTML = plan === 'pro' ? 
+                        '<i class="fas fa-rocket"></i> ترقية الآن' : 
+                        '<i class="fas fa-crown"></i> الخطة المميزة';
+                    button.className = plan === 'pro' ? 'btn btn-primary' : 'btn btn-gold';
+                    button.disabled = false;
+                    
+                    button.addEventListener('click', function() {
+                        showPaymentModal(plan);
+                    });
+                }
+            });
+        }
+
+        function showPaymentModal(plan) {
+            const modal = document.getElementById('paymentModal');
+            const planName = SubscriptionPlans[plan]?.name || 'مميز';
+            const planPrice = SubscriptionPlans[plan]?.price || 99;
+            
+            const selectedPlanName = document.getElementById('selectedPlanName');
+            const selectedPlanPrice = document.getElementById('selectedPlanPrice');
+            
+            if (selectedPlanName) {
+                selectedPlanName.textContent = planName;
+            }
+            
+            if (selectedPlanPrice) {
+                selectedPlanPrice.textContent = `$${planPrice}/شهر`;
+            }
+            
+            if (modal) {
+                modal.classList.add('active');
+            }
+            
+            document.querySelectorAll('.payment-method').forEach(method => {
+                method.addEventListener('click', function() {
+                    document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            const closePaymentBtn = document.getElementById('closePayment');
+            if (closePaymentBtn) {
+                closePaymentBtn.addEventListener('click', () => {
+                    if (modal) {
+                        modal.classList.remove('active');
+                    }
+                });
+            }
+            
+            const paymentForm = document.getElementById('paymentForm');
+            if (paymentForm) {
+                paymentForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    processPayment(plan);
+                });
+            }
+        }
+
+        function processPayment(plan) {
+            showLoading('جارٍ معالجة الدفع...');
+            
+            setTimeout(() => {
+                try {
+                    AppState.subscriptionPlan = plan;
+                    if (AppState.currentUser) {
+                        AppState.currentUser.subscriptionPlan = plan;
+                        localStorage.setItem('legalFraudUser', JSON.stringify(AppState.currentUser));
+                    }
+                    
+                    const paymentModal = document.getElementById('paymentModal');
+                    if (paymentModal) {
+                        paymentModal.classList.remove('active');
+                    }
+                    
+                    showNotification('success', 'تم الدفع بنجاح', `تم ترقية حسابك إلى الخطة ${SubscriptionPlans[plan]?.name || plan}`);
+                    
+                    updateUIForUser();
+                    updatePremiumFeatures();
+                    updateSubscriptionPage();
+                    
+                    logPayment(plan);
+                } catch (error) {
+                    showNotification('error', 'خطأ في الدفع', 'حدث خطأ أثناء معالجة الدفع');
+                } finally {
+                    hideLoading();
+                }
+            }, 2000);
+        }
+
+        function logPayment(plan) {
+            if (!AppState.currentUser) return;
+            
+            const paymentLog = {
+                userId: AppState.currentUser.email,
+                plan: plan,
+                amount: SubscriptionPlans[plan]?.price || 0,
+                date: new Date().toISOString(),
+                transactionId: 'TX' + Date.now()
+            };
+            
+            try {
+                const payments = JSON.parse(localStorage.getItem('paymentLogs') || '[]');
+                payments.push(paymentLog);
+                localStorage.setItem('paymentLogs', JSON.stringify(payments));
+            } catch (error) {
+                console.error('Error saving payment log:', error);
+            }
+        }
+
+        // ===== دوال مساعدة =====
+        function showNotifications() {
+            const notifications = [
+                { type: 'info', title: 'تحديث النظام', message: 'تم تحديث خوارزميات التحليل', time: 'منذ 5 دقائق' },
+                { type: 'success', title: 'تحليل مكتمل', message: 'تم تحليل عقد الشراكة بنجاح', time: 'منذ 30 دقيقة' },
+                { type: 'warning', title: 'تجديد الاشتراك', message: 'سيتم تجديد اشتراكك بعد 3 أيام', time: 'منذ ساعة' }
+            ];
+            
+            const notificationCenter = document.createElement('div');
+            notificationCenter.className = 'notification-center active';
+            notificationCenter.innerHTML = `
+                <div class="panel-header">
+                    <h3>الإشعارات</h3>
+                    <button class="btn-close" onclick="this.parentElement.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="notifications-list">
+                    ${notifications.map(notif => `
+                        <div class="notification-item ${notif.type}">
+                            <div class="notification-icon">
+                                <i class="fas fa-${notif.type === 'info' ? 'info-circle' : notif.type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                            </div>
+                            <div class="notification-content">
+                                <div class="notification-title">${notif.title}</div>
+                                <div class="notification-message">${notif.message}</div>
+                                <div class="notification-time">${notif.time}</div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="panel-footer">
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="markAllAsRead()">
+                        تعليم الكل كمقروء
+                    </button>
+                </div>
+            `;
+            
+            const existing = document.querySelector('.notification-center');
+            if (existing) {
+                existing.remove();
+            }
+            
+            document.body.appendChild(notificationCenter);
+            
+            setTimeout(() => {
+                document.addEventListener('click', function closeNotifications(e) {
+                    if (!notificationCenter.contains(e.target) && !e.target.closest('.notification-bell')) {
+                        notificationCenter.remove();
+                        document.removeEventListener('click', closeNotifications);
+                    }
+                });
+            }, 100);
+        }
+
+        function showUserMenu() {
+            const menu = document.createElement('div');
+            menu.className = 'user-menu active';
+            menu.innerHTML = `
+                <div class="menu-header">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <h4>${AppState.currentUser?.name || 'مستخدم'}</h4>
+                        <p>${AppState.userType === 'admin' ? 'المسؤول' : SubscriptionPlans[AppState.subscriptionPlan]?.name || 'بسيط'}</p>
+                    </div>
+                </div>
+                <div class="menu-items">
+                    <a href="#" class="menu-item" onclick="navigateToPage('dashboard'); return false;">
+                        <i class="fas fa-tachometer-alt"></i> لوحة التحكم
+                    </a>
+                    <a href="#" class="menu-item" onclick="navigateToPage('subscription'); return false;">
+                        <i class="fas fa-gem"></i> خطط الاشتراك
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-cog"></i> الإعدادات
+                    </a>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-question-circle"></i> المساعدة
+                    </a>
+                    <div class="menu-divider"></div>
+                    <a href="#" class="menu-item logout" onclick="logout(); return false;">
+                        <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
+                    </a>
+                </div>
+            `;
+            
+            const existing = document.querySelector('.user-menu');
+            if (existing) {
+                existing.remove();
+            }
+            
+            document.body.appendChild(menu);
+            
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!menu.contains(e.target) && !e.target.closest('.user-profile')) {
+                        menu.remove();
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 100);
+        }
+
+        function logout() {
+            if (AppState.cameraActive && AppState.currentStream) {
+                AppState.currentStream.getTracks().forEach(track => track.stop());
+                AppState.cameraActive = false;
+            }
+            
+                        AppState.isAuthenticated = false;
+            AppState.userType = null;
+            
+            localStorage.removeItem('legalFraudUser');
+            
+            const mainDashboard = document.getElementById('mainDashboard');
+            if (mainDashboard) {
+                mainDashboard.style.display = 'none';
+            }
+            
+            showNotification('success', 'تم تسجيل الخروج', 'تم تسجيل خروجك بنجاح');
+            showAuthModal();
+            
+            const userMenu = document.querySelector('.user-menu');
+            if (userMenu) {
+                userMenu.remove();
+            }
+        }
+
+        function markAllAsRead() {
+            const notificationBadge = document.querySelector('.notification-badge');
+            if (notificationBadge) {
+                notificationBadge.style.display = 'none';
+            }
+            
+            showNotification('success', 'تم', 'تم تعليم جميع الإشعارات كمقروءة');
+            
+            const notificationCenter = document.querySelector('.notification-center');
+            if (notificationCenter) {
+                notificationCenter.remove();
+            }
+        }
+
+        // ===== دوال مساعدة إضافية =====
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('ar-SA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function generateReport() {
+            showLoading('جارٍ إنشاء التقرير...');
+            
+            setTimeout(() => {
+                try {
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+                    
+                    doc.setFont('cairo', 'normal');
+                    doc.setFontSize(18);
+                    doc.text('تقرير LegalFraud AI', 105, 20, null, null, 'center');
+                    
+                    doc.setFontSize(12);
+                    doc.text(`المستخدم: ${AppState.currentUser?.name || 'غير محدد'}`, 20, 40);
+                    doc.text(`نوع الحساب: ${SubscriptionPlans[AppState.subscriptionPlan]?.name || 'بسيط'}`, 20, 50);
+                    doc.text(`تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}`, 20, 60);
+                    
+                    doc.setFontSize(14);
+                    doc.text('إحصائيات التحليل:', 20, 80);
+                    
+                    if (AppState.userStats) {
+                        const stats = AppState.userStats;
+                        doc.setFontSize(11);
+                        doc.text(`• المستندات التي تم تحليلها: ${stats.documentsAnalyzed}`, 25, 95);
+                        doc.text(`• المخاطر التي تم اكتشافها: ${stats.risksDetected}`, 25, 105);
+                        doc.text(`• دقة التحليل: ${stats.accuracy}%`, 25, 115);
+                        doc.text(`• متوسط وقت التحليل: ${stats.avgTime} دقيقة`, 25, 125);
+                        doc.text(`• القيمة المالية المحفوظة: $${stats.moneySaved}`, 25, 135);
+                    }
+                    
+                    doc.save(`تقرير_LegalFraud_AI_${Date.now()}.pdf`);
+                    
+                    showNotification('success', 'تم التصدير', 'تم إنشاء التقرير بنجاح');
+                } catch (error) {
+                    showNotification('error', 'خطأ', 'حدث خطأ أثناء إنشاء التقرير');
+                } finally {
+                    hideLoading();
+                }
+            }, 2000);
+        }
+
+        // ===== تهيئة التطبيق عند التحميل =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // تهيئة المصادقة
+            initAuth();
+            
+            // تهيئة مستمعي الأحداث
+            initEventListeners();
+            
+            // إعداد تحديث التطبيق عند العودة
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    location.reload();
+                }
+            });
+            
+            // إعداد خدمة العمل خارج الإنترنت
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js').catch(console.error);
+            }
+            
+            // عرض إشعار ترحيبي بعد 3 ثوانٍ
+            setTimeout(() => {
+                if (AppState.isAuthenticated) {
+                    const welcomeMessages = [
+                        `مرحباً ${AppState.currentUser?.name}! جاهز لبدء التحليل؟`,
+                        'اكتشف مخاطر مخفية في مستنداتك مع الذكاء الاصطناعي',
+                        'استفد من ميزاتنا المتقدمة لحماية عملك'
+                    ];
+                    
+                    const randomMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+                    showNotification('info', 'مرحباً بعودتك', randomMessage);
+                }
+            }, 3000);
+        });
+
+        // ===== دعم الشاشات الصغيرة =====
+        function initResponsiveDesign() {
+            function updateLayout() {
+                const isMobile = window.innerWidth < 768;
+                const headerActions = document.querySelector('.header-actions');
+                
+                if (isMobile && headerActions) {
+                    headerActions.style.flexDirection = 'column';
+                } else if (headerActions) {
+                    headerActions.style.flexDirection = 'row';
+                }
+            }
+            
+            window.addEventListener('resize', updateLayout);
+            updateLayout();
+        }
+
+        // ===== تنفيذ الوظائف الإضافية =====
+        function clearChat() {
+            const chatMessages = document.getElementById('chatMessages');
+            if (chatMessages) {
+                chatMessages.innerHTML = `
+                    <div class="message bot">
+                        <strong>المحامي الافتراضي:</strong> مرحباً! أنا المحامي الافتراضي. كيف يمكنني مساعدتك اليوم؟ يمكنني تقديم استشارات في:
+                        <br>• القضايا المدنية والتجارية
+                        <br>• القضايا الجنائية
+                        <br>• قضايا الأحوال الشخصية
+                        <br>• الاستشارات القانونية العامة
+                    </div>
+                `;
+                AppState.chatHistory = [];
+                showNotification('success', 'تم', 'تم مسح محادثة المحامي الافتراضي');
+            }
+        }
+
+        function clearSignatures() {
+            AppState.uploadedSignatures = {
+                original: null,
+                suspicious: null
+            };
+            
+            const originalPreview = document.getElementById('originalSignaturePreview');
+            const suspiciousPreview = document.getElementById('suspiciousSignaturePreview');
+            
+            if (originalPreview) {
+                originalPreview.innerHTML = '<i class="fas fa-upload"></i><span>اسحب وأفلت الصورة هنا</span>';
+            }
+            
+            if (suspiciousPreview) {
+                suspiciousPreview.innerHTML = '<i class="fas fa-upload"></i><span>اسحب وأفلت الصورة هنا</span>';
+            }
+            
+            const resultsContainer = document.getElementById('comparisonResults');
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '<p class="text-center" style="color: var(--text-secondary);">سيظهر هنا نتائج المقارنة بعد رفع التوقيعين</p>';
+            }
+            
+            showNotification('success', 'تم', 'تم مسح جميع التوقيعات');
+        }
+
+        // ===== إضافة مستمعي الأحداث للعناصر الجديدة =====
+        function attachAdditionalEventListeners() {
+            // مسح المحادثة
+            const clearChatBtn = document.getElementById('clearChat');
+            if (clearChatBtn) {
+                clearChatBtn.addEventListener('click', clearChat);
+            }
+            
+            // مسح التوقيعات
+            const clearSignaturesBtn = document.getElementById('clearSignatures');
+            if (clearSignaturesBtn) {
+                clearSignaturesBtn.addEventListener('click', clearSignatures);
+            }
+            
+            // قوالب قانونية
+            const legalTemplatesBtn = document.getElementById('legalTemplates');
+            if (legalTemplatesBtn) {
+                legalTemplatesBtn.addEventListener('click', function() {
+                    showNotification('info', 'قوالب قانونية', 'هذه الميزة قيد التطوير');
+                });
+            }
+            
+            // تصدير تقرير
+            const fraudReportBtn = document.getElementById('fraudReport');
+            if (fraudReportBtn) {
+                fraudReportBtn.addEventListener('click', generateReport);
+            }
+            
+            // اتصال بالمؤسسات
+            const contactEnterpriseBtn = document.getElementById('contactEnterprise');
+            if (contactEnterpriseBtn) {
+                contactEnterpriseBtn.addEventListener('click', function() {
+                    showNotification('info', 'اتصال بالمؤسسات', 'سيقوم فريق المبيعات بالاتصال بك قريباً');
+                });
+            }
+        }
+
+        // ===== تهيئة إضافية =====
+        initResponsiveDesign();
+        attachAdditionalEventListeners();
+
+        // ===== جعل الدوال متاحة عالمياً =====
+        window.handleChatInput = handleChatInput;
+        window.sendMessage = sendMessage;
+        window.askQuestion = askQuestion;
+        window.analyzeSignatures = analyzeSignatures;
+        window.analyzeContract = analyzeContract;
+        window.analyzeSuspiciousMessage = analyzeSuspiciousMessage;
+        window.analyzeEmail = analyzeEmail;
+        window.analyzeLink = analyzeLink;
+        window.logout = logout;
+    </script>
+</body>
+</html>
