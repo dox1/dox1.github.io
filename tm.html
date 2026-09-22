@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>3 تقني رياضي | بكالوريا</title>
+<style>
+:root{
+  --bg:#070b12;--panel:#0d1420;--panel2:#111b29;--text:#eef4ff;--muted:#91a0b7;
+  --line:#1d2a3b;--accent:#5ee7c4;--accent2:#65a8ff;--danger:#ff718b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Tahoma,Arial,sans-serif;background:
+  radial-gradient(circle at 90% 0%,rgba(94,231,196,.12),transparent 28%),
+  radial-gradient(circle at 0% 30%,rgba(101,168,255,.10),transparent 25%),var(--bg);
+  color:var(--text);min-height:100vh;
+}
+.container{width:min(1200px,94%);margin:auto}
+header{padding:42px 0 25px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid #234052;background:#0c1822;color:var(--accent);padding:8px 13px;font-size:13px}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+h1{font-size:clamp(30px,5vw,58px);line-height:1.08;margin-top:16px;letter-spacing:-2px}
+h1 span{color:var(--accent)}
+.subtitle{color:var(--muted);margin-top:12px;font-size:15px;line-height:1.8}
+.clock{font-size:28px;font-weight:700;letter-spacing:1px}.date{font-size:12px;color:var(--muted);margin-top:5px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:28px 0 18px}
+button,.select{
+  background:var(--panel);border:1px solid var(--line);color:var(--text);padding:11px 15px;
+  cursor:pointer;font:inherit;transition:.2s
+}
+button:hover,button.active{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+select{background:transparent;color:inherit;border:0;outline:0}
+select option{background:#0d1420}
+.schedule-wrap{background:rgba(13,20,32,.82);border:1px solid var(--line);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:850px}
+th,td{border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:13px 9px;text-align:center}
+th{background:#101a28;color:#9eafc7;font-size:12px;white-space:nowrap}
+th:first-child{position:sticky;right:0;z-index:2;background:#101a28}
+td:first-child{position:sticky;right:0;z-index:1;background:#0f1724;font-weight:bold;color:#fff}
+tr:last-child td{border-bottom:0}
+.slot{height:76px;background:#0b121d;vertical-align:middle}
+.subject{font-weight:bold;font-size:13px}
+.teacher{font-size:10px;color:var(--muted);margin-top:5px}
+.math{background:linear-gradient(135deg,#112c2b,#0d1b20)}
+.phys{background:linear-gradient(135deg,#13243b,#0d1828)}
+.civil{background:linear-gradient(135deg,#2a2012,#17150f)}
+.arabic{background:linear-gradient(135deg,#29172a,#17111c)}
+.fr{background:linear-gradient(135deg,#152833,#101922)}
+
+.english{background:linear-gradient(135deg,#18283a,#101a28)}
+.hist{background:linear-gradient(135deg,#2a2417,#17140e)}
+.islam{background:linear-gradient(135deg,#183326,#101d18)}
+.philosophy{background:linear-gradient(135deg,#2b202f,#17121a)}
+.pe{background:linear-gradient(135deg,#20302a,#111b17)}
+
+.empty{color:#334255}
+.legend{display:flex;gap:12px;flex-wrap:wrap;padding:18px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+.dot{display:inline-block;width:9px;height:9px;margin-left:5px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.card{background:var(--panel);border:1px solid var(--line);padding:18px}
+.card .n{font-size:25px;font-weight:bold}.card p{color:var(--muted);font-size:11px;margin-top:6px}
+.section-title{display:flex;justify-content:space-between;align-items:end;margin:34px 0 14px}
+.section-title h2{font-size:20px}.section-title small{color:var(--muted)}
+.notice{border-right:3px solid var(--accent);background:#0c171d;padding:16px;color:#b7c6d8;line-height:1.8;font-size:13px}
+footer{padding:35px 0;color:#65748b;text-align:center;font-size:11px}
+
+.schedule-section{margin-top:18px}
+.eyebrow{display:block;font-size:10px;letter-spacing:2px;color:#6f829b;margin-bottom:7px}
+.day-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:16px}
+.day-card{
+  border:1px solid var(--line);background:linear-gradient(180deg,#101a28,#0c131e);
+  color:var(--text);padding:16px 14px;min-height:115px;text-align:right;
+  cursor:pointer;transition:.2s;display:flex;flex-direction:column;justify-content:space-between;
+}
+.day-card span{font-size:11px;color:#6f829b}
+.day-card strong{font-size:18px}
+.day-card em{font-style:normal;font-size:11px;color:var(--muted)}
+.day-card:hover{transform:translateY(-2px);border-color:#35506a}
+.day-card.active{border-color:var(--accent);background:linear-gradient(145deg,#10251f,#0d171f);box-shadow:0 0 0 1px rgba(94,231,196,.16) inset}
+.day-card.active strong{color:var(--accent)}
+
+.selected-day{
+  margin-top:16px;border:1px solid var(--line);background:rgba(10,16,25,.92);
+  overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.22)
+}
+.selected-head{
+  padding:18px 20px;border-bottom:1px solid var(--line);display:flex;
+  justify-content:space-between;align-items:center;gap:12px
+}
+.selected-head h3{font-size:25px}
+.class-count{font-size:12px;color:var(--accent);border:1px solid #24453e;padding:8px 11px;background:#0d1a18}
+.class-list{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+.class-item{
+  display:grid;grid-template-columns:105px 1fr;min-height:92px;
+  border-bottom:1px solid var(--line);border-left:1px solid var(--line);
+  background:#0c131e
+}
+.class-item:nth-child(odd){border-left:0}
+.class-time{padding:17px 14px;color:#94a4bb;background:#0f1824;border-left:1px solid var(--line);font-size:12px}
+.class-time b{display:block;color:#f2f6fb;font-size:14px;margin-bottom:4px}
+.class-info{padding:16px}
+.class-info h4{font-size:16px;margin-bottom:7px}
+.class-info p{font-size:11px;color:var(--muted)}
+.subject-tag{display:inline-block;font-size:9px;padding:4px 7px;border:1px solid currentColor;margin-top:8px;opacity:.9}
+.class-item.math .class-info h4,.class-item.math .subject-tag{color:#5ee7c4}
+.class-item.phys .class-info h4,.class-item.phys .subject-tag{color:#65a8ff}
+.class-item.civil .class-info h4,.class-item.civil .subject-tag{color:#d99b4d}
+.class-item.arabic .class-info h4,.class-item.arabic .subject-tag{color:#d86bd8}
+.class-item.fr .class-info h4,.class-item.fr .subject-tag{color:#4ca6c8}
+.class-item.english .class-info h4,.class-item.english .subject-tag{color:#7ea7d9}
+.class-item.hist .class-info h4,.class-item.hist .subject-tag{color:#b48a55}
+.class-item.islam .class-info h4,.class-item.islam .subject-tag{color:#64b87a}
+.class-item.philosophy .class-info h4,.class-item.philosophy .subject-tag{color:#b16bc8}
+.class-item.pe .class-info h4,.class-item.pe .subject-tag{color:#65b894}
+
+
+.directory-section{margin-top:42px}
+.directory-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.directory-card{background:rgba(13,20,32,.86);border:1px solid var(--line);overflow:hidden}
+.directory-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.directory-head h3{font-size:19px}
+.directory-count{font-size:11px;color:var(--accent);border:1px solid #24453e;padding:7px 9px;background:#0d1a18}
+.person-list{display:flex;flex-direction:column}
+.person{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line)}
+.person:last-child{border-bottom:0}
+.avatar{width:38px;height:38px;display:grid;place-items:center;background:#111d2b;border:1px solid #26374b;color:var(--accent);font-weight:bold;font-size:12px;flex:none}
+.person-main{min-width:0}
+.person-name{font-size:13px;font-weight:bold}
+.person-meta{font-size:10px;color:var(--muted);margin-top:4px}
+.teacher-subject{color:var(--accent2)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:auto;box-shadow:0 0 8px rgba(94,231,196,.35)}
+.unknown .status-dot{background:#66758b;box-shadow:none}
+.teacher-disabled{opacity:.58;pointer-events:none;cursor:default;background:#0a1019}
+.teacher-disabled .person-name{color:#8492a5}
+.teacher-disabled .teacher-subject{color:#728096}
+.directory-empty{padding:14px 16px;color:var(--muted);font-size:11px;border-top:1px solid var(--line)}
+@media(max-width:700px){
+ .directory-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:700px){
+ .top{align-items:flex-start}.clock{font-size:19px}.date{display:none}
+ .stats{grid-template-columns:repeat(2,1fr)}
+ h1{letter-spacing:-1px}
+ .day-grid{grid-template-columns:repeat(2,1fr)}
+ .day-card:last-child{grid-column:1 / -1}
+ .selected-head{padding:16px}
+ .selected-head h3{font-size:22px}
+ .class-list{grid-template-columns:1fr}
+ .class-item,.class-item:nth-child(odd){border-left:0;grid-template-columns:88px 1fr}
+ .class-time{padding:15px 10px}
+ .class-info{padding:15px 12px}
+}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+  <div class="top">
+    <div>
+      <div class="badge"><i></i> BAC • 2026 / 2027</div>
+      <h1>3 تقني رياضي <span>— بكالوريا</span></h1>
+      <p class="subtitle">لا يخيب الله عبده إذا سعى . إذا إجتهدنا فكلنا نستحق البكالوريا </p>
+    </div>
+    <div style="text-align:left;direction:ltr">
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="date" id="date">---</div>
+    </div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="card"><div class="n">35</div><p>حصة أسبوعية</p></div>
+  <div class="card"><div class="n">10</div><p>مواد دراسية</p></div>
+  <div class="card"><div class="n">5</div><p>أيام دراسة</p></div>
+  <div class="card"><div class="n">Bac</div><p>الهدف: كلنا ناجحون إن شاء الله </p></div>
+</div>
+
+
+<section class="schedule-section">
+  <div class="section-title">
+    <div>
+      <span class="eyebrow">SCHEDULE</span>
+      <h2>استعمال الزمن</h2>
+    </div>
+    <small>اختر اليوم لعرض حصصك</small>
+  </div>
+
+  <div class="day-grid" id="dayGrid">
+    <button class="day-card active" data-day="الأحد">
+      <span>01</span><strong>الأحد</strong><em>7 حصص</em>
+    </button>
+    <button class="day-card" data-day="الإثنين">
+      <span>02</span><strong>الإثنين</strong><em>7 حصص</em>
+    </button>
+    <button class="day-card" data-day="الثلاثاء">
+      <span>03</span><strong>الثلاثاء</strong><em>7 حصص</em>
+    </button>
+    <button class="day-card" data-day="الأربعاء">
+      <span>04</span><strong>الأربعاء</strong><em>7 حصص</em>
+    </button>
+    <button class="day-card" data-day="الخميس">
+      <span>05</span><strong>الخميس</strong><em>7 حصص</em>
+    </button>
+  </div>
+
+  <div class="selected-day" id="selectedDay">
+    <div class="selected-head">
+      <div>
+        <span class="eyebrow">TODAY'S CLASSES</span>
+        <h3 id="selectedDayTitle">الأحد</h3>
+      </div>
+      <div class="class-count" id="classCount">7 حصص</div>
+    </div>
+    <div class="class-list" id="classList"></div>
+  </div>
+</section>
+
+
+<section class="directory-section">
+  <div class="section-title">
+    <div>
+      <span class="eyebrow">CLASS DIRECTORY</span>
+      <h2>القسم الدراسي</h2>
+    </div>
+    <small>التلاميذ والأساتذة</small>
+  </div>
+
+  <div class="directory-grid">
+    <div class="directory-card">
+      <div class="directory-head">
+        <h3>التلاميذ المتمدرسون</h3>
+        <span class="directory-count">07 تلاميذ</span>
+      </div>
+      <div class="person-list">
+        <div class="person"><div class="avatar">ق.م</div><div class="person-main"><div class="person-name">قدوري محمد</div><div class="person-meta">تلميذ</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">ب.ص</div><div class="person-main"><div class="person-name">بزيط صالح</div><div class="person-meta">تلميذ</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">د.خ</div><div class="person-main"><div class="person-name">داني خليفة</div><div class="person-meta">تلميذ</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">ع.أ</div><div class="person-main"><div class="person-name">عباسي ايمن</div><div class="person-meta">تلميذ</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">م.س</div><div class="person-main"><div class="person-name">محمدي سيدأحمد</div><div class="person-meta">تلميذ</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">ق.ع</div><div class="person-main"><div class="person-name">قرميط عيماد</div><div class="person-meta">تلميذ</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">س.ق</div><div class="person-main"><div class="person-name">سليماني قادة</div><div class="person-meta">تلميذ</div></div><span class="status-dot"></span></div>
+      </div>
+    </div>
+
+    <div class="directory-card">
+      <div class="directory-head">
+        <h3>الأساتذة</h3>
+        <span class="directory-count">10 مواد</span>
+      </div>
+      <div class="person-list">
+        <div class="person"><div class="avatar">ر</div><div class="person-main"><div class="person-name">قندوزي خيرة</div><div class="person-meta teacher-subject">الرياضيات</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">ع</div><div class="person-main"><div class="person-name">رامي جلول</div><div class="person-meta teacher-subject">اللغة العربية</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">ه</div><div class="person-main"><div class="person-name">حنان</div><div class="person-meta teacher-subject">الهندسة</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">ف</div><div class="person-main"><div class="person-name">توتاوي هيشام</div><div class="person-meta teacher-subject">الفيزياء</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">ف</div><div class="person-main"><div class="person-name">زوينة</div><div class="person-meta teacher-subject">الفلسفة</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">ت</div><div class="person-main"><div class="person-name">قرميط العربي</div><div class="person-meta teacher-subject">التاريخ والجغرافيا</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">إ</div>
+        <div class="person-main"><div class="person-name">عبداللاوي سفيان</div><div class="person-meta teacher-subject">التربية الإسلامية</div></div><span class="status-dot"></span></div>
+        <div class="person"><div class="avatar">ر</div>
+        
+        <div class="person-main"><div class="person-name">نعاس</div><div class="person-meta teacher-subject">التربية البدنية</div></div><span class="status-dot"></span></div>
+        
+        
+        <div class="person" aria-disabled="true">
+          <div class="avatar">ف</div>
+          <div class="person-main">
+            <div class="person-name">رحال</div>
+            <div class="person-meta teacher-subject">الفرنسية</div>
+          </div>
+          <span class="status-dot"></span>
+        </div>
+        <div class="person" aria-disabled="true">
+          <div class="avatar">إ</div>
+          <div class="person-main">
+            <div class="person-name">سوسن</div>
+            <div class="person-meta teacher-subject">الإنجليزية</div>
+          </div>
+          <span class="status-dot"></span>
+        </div>
+        <div class="directory-empty"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-title"><h2></h2></div>
+<div class="notice"></div>
+
+<footer>التقنيون</footer>
+</div>
+
+
+<script>
+function updateClock(){
+ const d=new Date();
+ document.getElementById('clock').textContent=d.toLocaleTimeString('ar-DZ',{hour12:false});
+ document.getElementById('date').textContent=d.toLocaleDateString('ar-DZ',{weekday:'long',day:'numeric',month:'long'});
+}
+setInterval(updateClock,1000);updateClock();
+
+const scheduleData = {
+ "الأحد":[
+  ["08:00 — 09:00","رياضيات","رياضيات","math"],
+  ["09:00 — 10:00","رياضيات","رياضيات","math"],
+  ["10:00 — 11:00","فيزياء","فيزياء","phys"],
+  ["11:00 — 12:00","فيزياء","فيزياء","phys"],
+  ["13:30 — 14:30","الفرنسية","Français","fr"],
+  ["14:30 — 15:30","التربية البدنية","تربية بدنية","pe"],
+  ["15:30 — 16:30","التربية البدنية","تربية بدنية","pe"]
+ ],
+ "الإثنين":[
+  ["08:00 — 09:00","رياضيات","رياضيات","math"],
+  ["09:00 — 10:00","رياضيات","رياضيات","math"],
+  ["10:00 — 11:00","هندسة","تخصص","civil"],
+  ["11:00 — 12:00","هندسة","تخصص","civil"],
+  ["13:30 — 14:30","اللغة العربية","لغة عربية","arabic"],
+  ["14:30 — 15:30","فيزياء","فيزياء","phys"],
+  ["15:30 — 16:30","الإنجليزية","English","english"]
+ ],
+ "الثلاثاء":[
+  ["08:00 — 09:00","هندسة","تخصص","civil"],
+  ["09:00 — 10:00","هندسة","تخصص","civil"],
+  ["10:00 — 11:00","اللغة العربية","لغة عربية","arabic"],
+  ["11:00 — 12:00","الفرنسية","Français","fr"],
+  ["13:30 — 14:30","رياضيات","رياضيات","math"],
+  ["14:30 — 15:30","رياضيات","رياضيات","math"],
+  ["15:30 — 16:30","التربية الإسلامية","إسلامية","islam"]
+ ],
+ "الأربعاء":[
+  ["08:00 — 09:00","رياضيات","رياضيات","math"],
+  ["09:00 — 10:00","رياضيات","رياضيات","math"],
+  ["10:00 — 11:00","الإنجليزية","English","english"],
+  ["11:00 — 12:00","اللغة العربية","لغة عربية","arabic"],
+  ["13:30 — 14:30","التربية الإسلامية","إسلامية","islam"],
+  ["14:30 — 15:30","التاريخ والجغرافيا","تاريخ وجغرافيا","hist"],
+  ["15:30 — 16:30","الإنجليزية","English","english"]
+ ],
+ "الخميس":[
+  ["08:00 — 09:00","فيزياء","فيزياء","phys"],
+  ["09:00 — 10:00","فيزياء","فيزياء","phys"],
+  ["10:00 — 11:00","الإنجليزية","English","english"],
+  ["11:00 — 12:00","الفرنسية","Français","fr"],
+  ["13:30 — 14:30","الفلسفة","فلسفة","philosophy"],
+  ["14:30 — 15:30","التاريخ والجغرافيا","تاريخ وجغرافيا","hist"],
+  ["15:30 — 16:30","لا توجد حصة","—","empty"]
+ ]
+};
+
+const dayButtons = document.querySelectorAll('.day-card');
+const list = document.getElementById('classList');
+const title = document.getElementById('selectedDayTitle');
+const count = document.getElementById('classCount');
+
+function renderDay(day){
+  const classes = scheduleData[day] || [];
+  title.textContent = day;
+  count.textContent = classes.length + " حصص";
+  list.innerHTML = classes.map(([time, subject, desc, type]) => {
+    const empty = type === "empty";
+    return `
+      <article class="class-item ${type}">
+        <div class="class-time"><b>${time.split(" — ")[0]}</b>${time.split(" — ")[1] || ""}</div>
+        <div class="class-info">
+          <h4>${subject}</h4>
+          <p>${desc}</p>
+          <span class="subject-tag">${empty ? "فترة فارغة" : "حصة دراسية"}</span>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+dayButtons.forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    dayButtons.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderDay(btn.dataset.day);
+  });
+});
+
+renderDay("الأحد");
+</script>
+
+</body>
+</html>
