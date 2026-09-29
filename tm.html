@@ -1,0 +1,1369 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>التقنيون | 3 تقني رياضي — بكالوريا</title>
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --bg:#070b12;--panel:#0d1420;--panel2:#111b29;--text:#eef4ff;--muted:#91a0b7;
+  --line:#1d2a3b;--accent:#5ee7c4;--accent2:#65a8ff;--danger:#ff718b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:Tahoma,Arial,sans-serif;background:
+  radial-gradient(circle at 90% 0%,rgba(94,231,196,.12),transparent 28%),
+  radial-gradient(circle at 0% 30%,rgba(101,168,255,.10),transparent 25%),var(--bg);
+  color:var(--text);min-height:100vh;
+}
+.container{width:min(1200px,94%);margin:auto}
+header{padding:42px 0 25px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.badge{display:inline-flex;align-items:center;gap:8px;border:1px solid #234052;background:#0c1822;color:var(--accent);padding:8px 13px;font-size:13px}
+.badge i{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+h1{font-size:clamp(30px,5vw,58px);line-height:1.08;margin-top:16px;letter-spacing:-2px}
+h1 span{color:var(--accent)}
+.subtitle{color:var(--muted);margin-top:12px;font-size:15px;line-height:1.8}
+.countdown-box{text-align:center;direction:ltr;margin:18px auto 2px;padding:14px 16px;border:1px solid var(--line);background:linear-gradient(180deg,#0d1722,#0a111b);width:min(720px,100%);box-shadow:0 12px 35px rgba(0,0,0,.18)}
+.countdown{font-size:38px;font-weight:800;letter-spacing:1px;color:var(--accent);line-height:1.2}
+.countdown span{font-size:20px;color:var(--muted);margin-left:7px}
+.date{font-size:12px;color:var(--muted);margin-top:5px}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin:28px 0 18px}
+button,.select{
+  background:var(--panel);border:1px solid var(--line);color:var(--text);padding:11px 15px;
+  cursor:pointer;font:inherit;transition:.2s
+}
+button:hover,button.active{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+select{background:transparent;color:inherit;border:0;outline:0}
+select option{background:#0d1420}
+.schedule-wrap{background:rgba(13,20,32,.82);border:1px solid var(--line);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.table-scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:850px}
+th,td{border-bottom:1px solid var(--line);border-left:1px solid var(--line);padding:13px 9px;text-align:center}
+th{background:#101a28;color:#9eafc7;font-size:12px;white-space:nowrap}
+th:first-child{position:sticky;right:0;z-index:2;background:#101a28}
+td:first-child{position:sticky;right:0;z-index:1;background:#0f1724;font-weight:bold;color:#fff}
+tr:last-child td{border-bottom:0}
+.slot{height:76px;background:#0b121d;vertical-align:middle}
+.subject{font-weight:bold;font-size:13px}
+.teacher{font-size:10px;color:var(--muted);margin-top:5px}
+.math{background:linear-gradient(135deg,#112c2b,#0d1b20)}
+.phys{background:linear-gradient(135deg,#13243b,#0d1828)}
+.civil{background:linear-gradient(135deg,#2a2012,#17150f)}
+.arabic{background:linear-gradient(135deg,#29172a,#17111c)}
+.fr{background:linear-gradient(135deg,#152833,#101922)}
+.english{background:linear-gradient(135deg,#18283a,#101a28)}
+.hist{background:linear-gradient(135deg,#2a2417,#17140e)}
+.islam{background:linear-gradient(135deg,#183326,#101d18)}
+.philosophy{background:linear-gradient(135deg,#2b202f,#17121a)}
+.pe{background:linear-gradient(135deg,#20302a,#111b17)}
+.empty{color:#334255}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.card{background:var(--panel);border:1px solid var(--line);padding:18px}
+.card .n{font-size:25px;font-weight:bold}.card p{color:var(--muted);font-size:11px;margin-top:6px}
+.section-title{display:flex;justify-content:space-between;align-items:end;margin:34px 0 14px}
+.section-title h2{font-size:20px}.section-title small{color:var(--muted)}
+.notice{border-right:3px solid var(--accent);background:#0c171d;padding:16px;color:#b7c6d8;line-height:1.8;font-size:13px}
+footer{padding:35px 0;color:#65748b;text-align:center;font-size:11px}
+
+.schedule-section{margin-top:18px}
+.eyebrow{display:block;font-size:10px;letter-spacing:2px;color:#6f829b;margin-bottom:7px}
+.day-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:16px}
+.day-card{
+  border:1px solid var(--line);background:linear-gradient(180deg,#101a28,#0c131e);
+  color:var(--text);padding:16px 14px;min-height:115px;text-align:right;
+  cursor:pointer;transition:.2s;display:flex;flex-direction:column;justify-content:space-between;
+}
+.day-card span{font-size:11px;color:#6f829b}
+.day-card strong{font-size:18px}
+.day-card em{font-style:normal;font-size:11px;color:var(--muted)}
+.day-card:hover{transform:translateY(-2px);border-color:#35506a}
+.day-card.active{border-color:var(--accent);background:linear-gradient(145deg,#10251f,#0d171f);box-shadow:0 0 0 1px rgba(94,231,196,.16) inset}
+.day-card.active strong{color:var(--accent)}
+
+.selected-day{
+  margin-top:16px;border:1px solid var(--line);background:rgba(10,16,25,.92);
+  overflow:hidden;box-shadow:0 18px 45px rgba(0,0,0,.22)
+}
+.selected-head{
+  padding:18px 20px;border-bottom:1px solid var(--line);display:flex;
+  justify-content:space-between;align-items:center;gap:12px
+}
+.selected-head h3{font-size:25px}
+.class-count{font-size:12px;color:var(--accent);border:1px solid #24453e;padding:8px 11px;background:#0d1a18}
+.class-list{display:grid;grid-template-columns:repeat(2,1fr);gap:0}
+.class-item{
+  display:grid;grid-template-columns:105px 1fr;min-height:92px;
+  border-bottom:1px solid var(--line);border-left:1px solid var(--line);
+  background:#0c131e
+}
+.class-item:nth-child(odd){border-left:0}
+.class-time{padding:17px 14px;color:#94a4bb;background:#0f1824;border-left:1px solid var(--line);font-size:12px}
+.class-time b{display:block;color:#f2f6fb;font-size:14px;margin-bottom:4px}
+.class-info{padding:16px}
+.class-info h4{font-size:16px;margin-bottom:7px}
+.class-info p{font-size:11px;color:var(--muted)}
+.subject-tag{display:inline-block;font-size:9px;padding:4px 7px;border:1px solid currentColor;margin-top:8px;opacity:.9}
+.class-item.math .class-info h4,.class-item.math .subject-tag{color:#5ee7c4}
+.class-item.phys .class-info h4,.class-item.phys .subject-tag{color:#65a8ff}
+.class-item.civil .class-info h4,.class-item.civil .subject-tag{color:#d99b4d}
+.class-item.arabic .class-info h4,.class-item.arabic .subject-tag{color:#d86bd8}
+.class-item.fr .class-info h4,.class-item.fr .subject-tag{color:#4ca6c8}
+.class-item.english .class-info h4,.class-item.english .subject-tag{color:#7ea7d9}
+.class-item.hist .class-info h4,.class-item.hist .subject-tag{color:#b48a55}
+.class-item.islam .class-info h4,.class-item.islam .subject-tag{color:#64b87a}
+.class-item.philosophy .class-info h4,.class-item.philosophy .subject-tag{color:#b16bc8}
+.class-item.pe .class-info h4,.class-item.pe .subject-tag{color:#65b894}
+
+/* ================= الصفحات المستقلة ================= */
+.page-view {
+  display: none;
+  min-height: 100vh;
+  padding: 20px 0;
+}
+.page-view.active {
+  display: block;
+}
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+.page-header h2 {
+  font-size: 24px;
+  color: var(--accent);
+}
+.back-btn-main {
+  background: #0d1a18;
+  border: 1px solid #24453e;
+  color: var(--accent);
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: .2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.back-btn-main:hover {
+  background: #12251f;
+  transform: translateY(-1px);
+}
+@media(max-width:700px){
+ .top{align-items:flex-start}.countdown-box{margin-top:14px;padding:12px 10px}.countdown{font-size:29px}.countdown span{font-size:16px}.date{display:none}
+ .stats{grid-template-columns:repeat(2,1fr)}
+ h1{letter-spacing:-1px}
+ .page-header {flex-direction:column;gap:15px;text-align:center}
+}
+
+/* ================= تجربة الدخول الرسمية ================= */
+body{overflow-x:hidden}
+body.auth-required #mainPage,body.auth-required #sectionPage,body.auth-required #workspacePage{display:none!important}
+body.approval-required #mainPage,body.approval-required #sectionPage,body.approval-required #workspacePage{display:none!important}
+#splashScreen{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:radial-gradient(circle at 50% 38%,rgba(94,231,196,.10),transparent 30%),#070b12;opacity:1;visibility:visible;transition:opacity .8s ease,visibility .8s ease}
+#splashScreen.hide{opacity:0;visibility:hidden;pointer-events:none}
+.splash-inner{text-align:center;padding:24px}
+.splash-mark{width:74px;height:74px;display:grid;place-items:center;margin:0 auto 22px;border:1px solid rgba(94,231,196,.35);background:rgba(13,26,24,.65);color:var(--accent);font-size:27px;font-weight:800;box-shadow:0 0 0 1px rgba(94,231,196,.06) inset,0 20px 70px rgba(0,0,0,.4);animation:markFloat 2s ease-in-out infinite}
+.splash-kicker{font-size:10px;letter-spacing:3px;color:#6f829b;margin-bottom:14px}
+.splash-title{font-size:clamp(34px,7vw,62px);font-weight:800;letter-spacing:-1.5px;line-height:1.12;animation:fadeUp 1.05s ease both}
+.splash-title span{color:var(--accent)}
+.splash-line{width:44px;height:1px;background:var(--accent);opacity:.45;margin:17px auto}
+.splash-sub{font-size:12px;color:var(--muted);line-height:1.8;animation:fadeUp 1.25s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes markFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+#authScreen{min-height:100vh;display:grid;place-items:center;padding:28px 18px}
+.auth-shell{width:min(500px,100%);position:relative;background:rgba(10,16,25,.97);border:1px solid #1d2a3b;box-shadow:0 35px 100px rgba(0,0,0,.45);padding:30px 28px 24px;overflow:hidden}
+.auth-shell::before{content:"";position:absolute;top:0;right:0;left:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);opacity:.75}
+.auth-brand{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:25px}
+.auth-brand .mark{width:46px;height:46px;display:grid;place-items:center;border:1px solid #24453e;color:var(--accent);font-weight:800;font-size:18px;background:#0d1a18}
+.auth-brand h2{font-size:23px}.auth-brand p{font-size:10px;color:var(--muted);margin-top:5px}
+.auth-progress{display:flex;align-items:center;gap:7px;margin-bottom:24px}
+.auth-progress span{height:3px;flex:1;background:#142131;transition:.3s}.auth-progress span.active{background:var(--accent)}
+.wizard-step{display:none;animation:stepIn .45s ease both}.wizard-step.active{display:block}
+@keyframes stepIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.step-kicker{font-size:10px;letter-spacing:2px;color:#6f829b;margin-bottom:8px}
+.step-title{font-size:27px;line-height:1.35;margin-bottom:8px}.step-title span{color:var(--accent)}
+.step-description{font-size:12px;color:var(--muted);line-height:1.85;margin-bottom:20px}
+.field-label{display:block;font-size:11px;color:#9eafc7;margin-bottom:7px}
+.auth-input{width:100%;background:#0a111b;border:1px solid var(--line);color:var(--text);padding:14px 13px;font:inherit;outline:none;transition:.2s}
+.auth-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(94,231,196,.06)}
+.auth-actions{display:flex;gap:9px;margin-top:16px}.primary-action,.secondary-action{flex:1;padding:13px 15px;font-size:12px;font-weight:700}
+.primary-action{background:#10251f;border-color:#24453e;color:var(--accent)}
+.secondary-action{background:#0c131e;border-color:var(--line);color:#9eafc7}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:17px}
+.role-card{min-height:150px;padding:20px 16px;text-align:right;background:#0c131e;border:1px solid var(--line);color:var(--text);cursor:pointer;transition:.22s;position:relative;overflow:hidden}
+.role-card:hover{transform:translateY(-2px);border-color:#35506a}.role-card strong{display:block;font-size:18px;margin-bottom:7px}.role-card p{font-size:10px;color:var(--muted);line-height:1.7}.role-card .role-icon{position:absolute;left:14px;bottom:12px;color:var(--accent);font-size:22px;opacity:.8}
+.subject-options{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}.subject-option{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:#0a111b;padding:11px 10px;font-size:10px;color:#9eafc7;cursor:pointer;transition:.2s}.subject-option:hover{border-color:#35506a}.subject-option input{accent-color:var(--accent);margin:0}
+.password-note{margin-top:12px;padding:12px 13px;border-right:2px solid #d99b4d;background:#17130d;color:#c7b89c;font-size:10px;line-height:1.8}
+.auth-error{min-height:18px;margin-top:11px;color:var(--danger);font-size:11px;line-height:1.6}
+.auth-note{margin-top:18px;font-size:9px;color:#66778d;line-height:1.8;text-align:center}
+.existing-account{display:block;width:100%;margin-top:15px;background:transparent;border:0;color:#6f829b;font-size:10px;padding:7px;cursor:pointer}.existing-account:hover{color:var(--accent);transform:none}
+#approvalScreen{min-height:100vh;display:none;place-items:center;padding:24px}
+body.approval-required #approvalScreen{display:grid}
+.approval-shell{width:min(560px,100%);background:rgba(13,20,32,.97);border:1px solid var(--line);box-shadow:0 30px 90px rgba(0,0,0,.4);padding:30px;text-align:center}
+.approval-icon{width:70px;height:70px;display:grid;place-items:center;margin:0 auto 18px;border:1px solid #4a3920;background:#18140e;color:#d99b4d;font-size:28px;animation:markFloat 2.2s ease-in-out infinite}
+.approval-shell h2{font-size:26px;margin-bottom:8px}.approval-shell h3{font-size:15px;color:var(--accent);margin-bottom:10px}.approval-shell p{font-size:12px;color:var(--muted);line-height:1.9}
+.approval-status{margin:18px 0;padding:14px;border:1px solid #4a3920;background:#18140e;color:#d99b4d;font-size:11px;line-height:1.8}.approval-status.approved{border-color:#24453e;background:#0d1a18;color:var(--accent)}.approval-status.rejected{border-color:#4d2832;background:#190f14;color:var(--danger)}
+.approval-actions{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:15px}.approval-actions button{font-size:10px}.pending-request{font-size:10px!important;color:#7f90a8!important;margin-top:7px}
+.account-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;padding:10px 12px;background:#0b121d;border:1px solid var(--line)}
+.account-main{display:flex;align-items:center;gap:10px;min-width:0}.avatar-mini{width:35px;height:35px;display:grid;place-items:center;background:#10251f;border:1px solid #24453e;color:var(--accent);font-weight:bold}.account-name{font-size:12px;font-weight:bold;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.account-role{font-size:10px;color:var(--muted);margin-top:2px}.account-actions{display:flex;gap:8px;flex-wrap:wrap}.account-actions button{font-size:11px;padding:8px 10px}.teacher-btn{color:#d99b4d;border-color:#4a3920;background:#18140e}.admin-btn{color:#65a8ff;border-color:#233b5b;background:#101a28}
+.materials-live{margin-top:42px}.material-subject-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:16px}.material-subject{min-height:92px;padding:13px;background:#0c131e;border:1px solid var(--line);color:var(--text);text-align:right;cursor:pointer;transition:.2s;display:flex;flex-direction:column;justify-content:space-between}.material-subject:hover,.material-subject.active{transform:translateY(-2px);border-color:var(--accent)}.material-subject strong{font-size:14px}.material-subject span{font-size:10px;color:var(--muted)}
+.materials-panel{margin-top:14px;background:rgba(13,20,32,.86);border:1px solid var(--line);padding:16px}.materials-panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:12px}.materials-panel-head h3{font-size:18px}.materials-panel-head small{color:var(--muted)}.material-list{display:grid;gap:10px}.material-item{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px;background:#0b121d;border:1px solid var(--line)}.material-item-main{min-width:0}.material-item h4{font-size:14px}.material-item p{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.6}.material-meta{font-size:9px;color:#74859e;margin-top:8px}.material-actions{display:flex;gap:7px;flex:none}.material-actions button{padding:8px 10px;font-size:10px}.material-open{color:var(--accent);border-color:#24453e;background:#0d1a18}.material-delete{color:var(--danger);border-color:#4d2832;background:#190f14}.empty-state{padding:24px 10px;text-align:center;color:var(--muted);font-size:12px}
+#workspacePage{padding-bottom:50px}.workspace-grid{display:grid;grid-template-columns:1fr;gap:16px}.workspace-card{background:rgba(13,20,32,.9);border:1px solid var(--line);padding:18px}.workspace-card h3{font-size:19px;margin-bottom:6px}.workspace-card>p{font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:15px}.admin-table-wrap{overflow:auto}.admin-table{min-width:780px}.admin-table th,.admin-table td{text-align:right}.role-select,.subject-checks{display:flex;flex-wrap:wrap;gap:5px}.subject-checks label{font-size:9px;padding:5px 7px;border:1px solid var(--line);cursor:pointer;color:#9eafc7}.subject-checks input{accent-color:#5ee7c4}.admin-save{padding:7px 10px;font-size:10px;color:var(--accent);border-color:#24453e;background:#0d1a18}.workspace-top{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}.workspace-top h2{font-size:25px;color:var(--accent)}
+@media(max-width:1000px){.material-subject-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.role-grid{grid-template-columns:1fr}.subject-options{grid-template-columns:1fr}.account-bar{align-items:flex-start;flex-direction:column}.account-actions{width:100%}.account-actions button{flex:1}.material-subject-grid{grid-template-columns:repeat(2,1fr)}.material-item{align-items:flex-start;flex-direction:column}.material-actions{width:100%}.material-actions button{flex:1}.teacher-form-grid{grid-template-columns:1fr}.teacher-form-grid .full{grid-column:auto}.workspace-top{align-items:flex-start;flex-direction:column}.auth-shell{padding:25px 18px 20px}.step-title{font-size:24px}}
+
+
+/* ================= تنظيم الواجهة والأقسام ================= */
+.auth-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.auth-choice{min-height:145px;padding:20px 18px;text-align:right;background:linear-gradient(180deg,#101a28,#0c131e);border:1px solid var(--line);color:var(--text);cursor:pointer;transition:.22s;position:relative;overflow:hidden}
+.auth-choice:hover{transform:translateY(-2px);border-color:var(--accent)}
+.auth-choice strong{display:block;font-size:18px;margin-bottom:8px}.auth-choice p{font-size:10px;color:var(--muted);line-height:1.8}.auth-choice .choice-icon{position:absolute;left:15px;bottom:12px;font-size:24px;color:var(--accent);opacity:.75}
+.auth-back{display:inline-flex;align-items:center;gap:7px;margin-top:12px;background:transparent;border:0;color:#6f829b;font-size:10px;padding:7px;cursor:pointer}.auth-back:hover{color:var(--accent);transform:none}
+.section-block{margin-top:30px;padding:18px;background:rgba(13,20,32,.72);border:1px solid var(--line)}
+.section-block-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.section-block-head h3{font-size:17px}.section-block-head small{font-size:10px;color:var(--muted)}
+.teacher-subject-banner{display:none;margin:18px 0 0;padding:16px 18px;background:linear-gradient(145deg,#10251f,#0d171f);border:1px solid #24453e}.teacher-subject-banner.show{display:flex;align-items:center;justify-content:space-between;gap:12px}.teacher-subject-banner h3{font-size:19px;color:var(--accent)}.teacher-subject-banner p{margin-top:4px;font-size:10px;color:var(--muted);line-height:1.7}
+.subject-section-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.subject-section-card{padding:16px;background:#0b121d;border:1px solid var(--line);min-width:0}.subject-section-card.teacher-owner{border-color:#24453e;background:linear-gradient(145deg,#0f1e1b,#0b121d)}.subject-section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.subject-section-head h4{font-size:15px}.subject-section-head span{font-size:9px;color:var(--muted);border:1px solid var(--line);padding:4px 7px}.subject-section-card p{font-size:10px;color:var(--muted);line-height:1.7;margin-top:8px}.subject-section-meta{margin-top:10px;font-size:10px;color:#74859e}
+.admin-sections{display:grid;gap:14px}.admin-group{border:1px solid var(--line);background:#0b121d;overflow:hidden}.admin-group-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 14px;border-bottom:1px solid var(--line);background:#101a28}.admin-group-head h4{font-size:14px}.admin-group-head span{font-size:9px;color:var(--muted)}.admin-user-list{display:grid;gap:9px;padding:10px}.admin-user-card{border:1px solid var(--line);background:#0c131e;padding:13px}.admin-user-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.admin-user-name{font-size:13px;font-weight:700}.admin-user-meta{font-size:9px;color:#74859e;margin-top:4px;line-height:1.6}.admin-user-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.admin-user-controls label{font-size:9px;color:#8191a6}.admin-user-controls select{width:100%;background:#0a111b;border:1px solid var(--line);color:var(--text);padding:8px;font-size:10px}.admin-user-subjects{margin-top:9px}.admin-user-subjects strong{display:block;font-size:9px;color:#8191a6;margin-bottom:6px}.admin-subject-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}.admin-subject-grid label{font-size:8px;padding:6px;border:1px solid var(--line);background:#0a111b;color:#9eafc7}.admin-user-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}.admin-user-actions button{font-size:10px;padding:8px 12px}.admin-delete{color:#ff8aa0;border-color:#5b2734;background:#1a0f15}.admin-delete:hover{border-color:#ff718b;color:#ff9ab0;background:#241018}.admin-empty{padding:18px;text-align:center;color:var(--muted);font-size:10px}
+.workspace-subject-content{margin-top:12px;padding:13px;background:#0b121d;border:1px solid var(--line)}.workspace-subject-content h4{font-size:14px;color:var(--accent);margin-bottom:8px}.workspace-subject-content .empty-state{padding:14px 4px}
+@media(max-width:700px){
+ .auth-choice-grid{grid-template-columns:1fr}.auth-choice{min-height:120px}
+ .subject-section-grid{grid-template-columns:1fr}
+ .teacher-subject-banner.show{align-items:flex-start;flex-direction:column}
+ .admin-user-controls{grid-template-columns:1fr}
+ .admin-subject-grid{grid-template-columns:1fr}
+ .workspace-card{padding:14px}.workspace-top h2{font-size:22px}.workspace-top p{line-height:1.7}
+ .section-block{padding:14px}.section-block-head{align-items:flex-start;flex-direction:column}
+}
+
+/* ================= الصفحات المستقلة: استعمال الزمن والمواد ================= */
+.section-card{width:100%;display:flex;align-items:center;gap:16px;text-align:right;padding:18px;background:linear-gradient(145deg,#10251f,#0c151a);border:1px solid #24453e;color:var(--text);cursor:pointer;transition:.2s;position:relative}
+.section-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.section-card-icon{width:48px;height:48px;display:grid;place-items:center;border:1px solid #24453e;color:var(--accent);font-size:22px;flex:none;background:#0d1a18}
+.section-card-body{flex:1;min-width:0}.section-card-body h3{font-size:19px;margin-bottom:6px}.section-card-body p{font-size:10px;color:var(--muted);line-height:1.8}.section-card-arrow{font-size:20px;color:var(--accent);flex:none}
+.section-page-content{display:grid;gap:16px}.schedule-day-page,.subject-page-materials{background:rgba(13,20,32,.86);border:1px solid var(--line);overflow:hidden}.schedule-day-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:16px;background:#101a28;border-bottom:1px solid var(--line)}.schedule-day-head>div{display:flex;align-items:center;gap:10px}.schedule-day-number{font-size:10px;color:var(--accent);border:1px solid #24453e;background:#0d1a18;padding:5px 8px}.schedule-day-head h3{font-size:18px}.schedule-day-count{font-size:10px;color:var(--muted);border:1px solid var(--line);padding:6px 9px}.schedule-page-list{display:grid;grid-template-columns:repeat(2,1fr)}.schedule-page-item{display:grid;grid-template-columns:92px 1fr;min-height:94px;border-bottom:1px solid var(--line);border-left:1px solid var(--line);background:#0c131e}.schedule-page-item:nth-child(odd){border-left:0}.schedule-page-time{padding:15px 12px;background:#0f1824;color:#9eafc7;border-left:1px solid var(--line)}.schedule-page-time b{display:block;color:#eef4ff;font-size:13px}.schedule-page-time span{display:block;font-size:10px;margin-top:4px}.schedule-page-info{padding:14px}.schedule-page-info h4{font-size:14px}.schedule-page-info p{font-size:10px;color:var(--muted);margin-top:4px}.schedule-page-info>span{display:inline-block;font-size:8px;padding:4px 6px;border:1px solid currentColor;margin-top:7px;opacity:.85}.schedule-page-item.math .schedule-page-info h4,.schedule-page-item.math .schedule-page-info>span{color:#5ee7c4}.schedule-page-item.phys .schedule-page-info h4,.schedule-page-item.phys .schedule-page-info>span{color:#65a8ff}.schedule-page-item.civil .schedule-page-info h4,.schedule-page-item.civil .schedule-page-info>span{color:#d99b4d}.schedule-page-item.arabic .schedule-page-info h4,.schedule-page-item.arabic .schedule-page-info>span{color:#d86bd8}.schedule-page-item.fr .schedule-page-info h4,.schedule-page-item.fr .schedule-page-info>span{color:#4ca6c8}.schedule-page-item.english .schedule-page-info h4,.schedule-page-item.english .schedule-page-info>span{color:#7ea7d9}.schedule-page-item.hist .schedule-page-info h4,.schedule-page-item.hist .schedule-page-info>span{color:#b48a55}.schedule-page-item.islam .schedule-page-info h4,.schedule-page-item.islam .schedule-page-info>span{color:#64b87a}.schedule-page-item.philosophy .schedule-page-info h4,.schedule-page-item.philosophy .schedule-page-info>span{color:#b16bc8}.schedule-page-item.pe .schedule-page-info h4,.schedule-page-item.pe .schedule-page-info>span{color:#65b894}.schedule-page-item.empty .schedule-page-info{opacity:.65}.subject-page-intro{display:flex;align-items:center;gap:14px;padding:18px;background:linear-gradient(145deg,#101a28,#0c131e);border:1px solid var(--line)}.subject-page-intro.mine{border-color:#24453e;background:linear-gradient(145deg,#10251f,#0d171f)}.subject-page-icon{width:54px;height:54px;display:grid;place-items:center;border:1px solid #24453e;background:#0d1a18;color:var(--accent);font-size:21px;font-weight:800}.subject-page-intro h3{font-size:21px}.subject-page-intro p{font-size:11px;color:var(--muted);line-height:1.8;margin-top:4px}.subject-page-materials{padding:16px}.subject-page-material-head{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:12px}.subject-page-material-head h3{font-size:18px}.subject-page-material-head>span{font-size:10px;color:var(--accent);border:1px solid #24453e;background:#0d1a18;padding:6px 9px}.subject-page-material{margin-bottom:9px}.workspace-note{font-size:11px;color:var(--muted);line-height:1.8}
+@media(max-width:700px){.section-card{align-items:flex-start;padding:15px}.section-card-icon{width:44px;height:44px}.section-card-body h3{font-size:17px}.section-page-header{padding:15px}.section-page-header h2{font-size:22px}.schedule-page-list{grid-template-columns:1fr}.schedule-page-item,.schedule-page-item:nth-child(odd){border-left:0;grid-template-columns:82px 1fr}.schedule-day-head{align-items:flex-start;flex-direction:column}.subject-page-intro{align-items:flex-start}.subject-page-icon{width:46px;height:46px}.subject-page-intro h3{font-size:18px}.subject-page-materials{padding:12px}.subject-page-material-head{align-items:flex-start;flex-direction:column}}
+
+/* ================== Supabase file publishing ================== */
+.teacher-publish-box{border:1px solid var(--line);background:#0b121d;padding:14px}.publish-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.publish-head h4{font-size:15px}.publish-limit{font-size:9px;color:#74859e;border:1px solid var(--line);padding:5px 7px}.publish-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.publish-grid label{display:block;font-size:9px;color:#8191a6}.publish-grid .auth-input{margin-top:6px}.publish-grid textarea{resize:vertical}.publish-file-info{margin-top:9px;font-size:9px;color:#7f90a8;padding:9px;border:1px dashed var(--line);background:#0a111b}.publish-actions{display:flex;align-items:center;gap:10px;margin-top:10px}.publish-actions button{font-size:10px}.publish-progress{font-size:9px;color:var(--accent)}.file-modal{position:fixed;inset:0;display:none;z-index:200}.file-modal.show{display:block}.file-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}.file-modal-card{position:absolute;inset:5vh 4vw;background:#0a111b;border:1px solid var(--line);box-shadow:0 30px 100px rgba(0,0,0,.55);display:flex;flex-direction:column}.file-modal-head{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line)}.file-modal-head h3{font-size:16px;color:var(--accent)}.file-modal-body{flex:1;display:grid;place-items:center;min-height:0;padding:12px;overflow:auto}.file-preview-image{max-width:100%;max-height:100%;object-fit:contain;border:1px solid var(--line)}.file-preview-pdf{width:100%;height:100%;min-height:70vh;border:1px solid var(--line);background:#fff}
+@media(max-width:700px){.publish-grid{grid-template-columns:1fr}.publish-head{align-items:flex-start;flex-direction:column}.file-modal-card{inset:3vh 12px}.file-modal-body{padding:7px}.file-preview-pdf{min-height:78vh}}
+
+/* Final mobile polish */
+@media(max-width:480px){
+  .container{width:min(100% - 24px,1200px)}
+  header{padding:26px 0 18px}.top{gap:10px}.badge{font-size:10px;padding:7px 10px}.subtitle{font-size:12px}.countdown-box{margin-top:12px;padding:11px 8px}.countdown{font-size:24px}.countdown span{font-size:14px}
+  .stats{gap:8px}.card{padding:13px}.card .n{font-size:21px}
+  .section-block{margin-top:18px;padding:12px}.section-block-head{margin-bottom:10px}
+  .subject-section-card{padding:13px}.subject-section-head h4{font-size:13px}.subject-section-card p{font-size:9px}.subject-section-meta{font-size:9px}
+  .page-view{padding:10px 0 24px}.page-header{margin-bottom:12px}
+}
+</style>
+</head>
+<body class="auth-required">
+
+<!-- ======================= شاشة البداية الرسمية ======================= -->
+<section id="splashScreen">
+  <div class="splash-inner">
+    <div class="splash-mark">T</div>
+    <div class="splash-kicker">PLATFORM • BAC 2026 / 2027</div>
+    <div class="splash-title">مرحبا بالمهندس <span>...</span></div>
+    <div class="splash-line"></div>
+    <div class="splash-sub">منصة التقنيين — فضاء الدراسة والمحتوى التعليمي</div>
+  </div>
+</section>
+
+<!-- ======================= مسار التسجيل ======================= -->
+<section id="authScreen">
+  <div class="auth-shell">
+    <div class="auth-brand">
+      <div>
+        <h2>التقنيون</h2>
+        <p>بوابتك إلى فضاء الدراسة</p>
+      </div>
+      <div class="mark">T</div>
+    </div>
+    <div class="auth-progress" id="authProgress"><span class="active"></span><span></span><span></span><span></span></div>
+
+    <div class="wizard-step active" id="stepEntryChoice">
+      <div class="step-kicker">بوابة الدخول</div>
+      <h2 class="step-title">كيف تريد <span>المتابعة؟</span></h2>
+      <p class="step-description">اختر أحد الخيارين للانتقال إلى الخطوة المناسبة لك.</p>
+      <div class="auth-choice-grid">
+        <button class="auth-choice" id="startSignupBtn" type="button"><strong>إنشاء حساب</strong><p>حساب جديد للتلميذ أو الأستاذ، ثم انتظار موافقة الإدارة.</p><span class="choice-icon">＋</span></button>
+        <button class="auth-choice" id="startLoginBtn" type="button"><strong>تسجيل الدخول</strong><p>لدي حساب بالفعل وأريد الدخول إلى المنصة.</p><span class="choice-icon">↪</span></button>
+      </div>
+    </div>
+
+    <div class="wizard-step" id="stepName">
+      <div class="step-kicker">01 • التعريف</div>
+      <h2 class="step-title">أدخل اسمك <span>ولقبك</span></h2>
+      <p class="step-description">سنستخدم اسمك للتعريف بحسابك داخل المنصة.</p>
+      <label class="field-label" for="regName">الاسم واللقب</label>
+      <input class="auth-input" id="regName" type="text" autocomplete="name" placeholder="مثال: محمد قدوري" maxlength="80">
+      <div class="auth-error" id="authError"></div>
+      <div class="auth-actions"><button class="primary-action" id="nameNext" type="button">التالي</button></div>
+      <button class="auth-back" id="backFromSignup" type="button">← العودة لاختيار طريقة الدخول</button>
+    </div>
+
+    <div class="wizard-step" id="stepWelcome">
+      <div class="step-kicker">02 • الترحيب</div>
+      <h2 class="step-title">مرحبًا بك، <span id="welcomeName">—</span></h2>
+      <p class="step-description">سنكمل إعداد حسابك بخطوات بسيطة.</p>
+    </div>
+
+    <div class="wizard-step" id="stepRole">
+      <div class="step-kicker">03 • نوع الحساب</div>
+      <h2 class="step-title">هل أنت <span>تلميذ</span> أم أستاذ؟</h2>
+      <p class="step-description">اختر نوع حسابك لتخصيص الصلاحيات والمحتوى المناسب لك.</p>
+      <div class="role-grid">
+        <button class="role-card" type="button" data-role="student"><strong>تلميذ</strong><p>أريد متابعة الدروس والمحتوى والمنشورات التعليمية.</p><span class="role-icon">◈</span></button>
+        <button class="role-card" type="button" data-role="teacher"><strong>أستاذ</strong><p>أريد نشر المحتوى التعليمي الخاص بمادتي.</p><span class="role-icon">✦</span></button>
+      </div>
+    </div>
+
+    <div class="wizard-step" id="stepStudentPassword">
+      <div class="step-kicker">04 • حماية الحساب</div>
+      <h2 class="step-title">عيّن <span>كلمة مرورك</span></h2>
+      <p class="step-description">اختر كلمة مرور تحفظها جيدًا. لا توجد إمكانية لاسترجاعها من داخل المنصة.</p>
+      <label class="field-label" for="studentPassword">كلمة المرور</label>
+      <input class="auth-input" id="studentPassword" type="password" autocomplete="new-password" minlength="6" placeholder="••••••••">
+      <label class="field-label" for="studentPassword2" style="margin-top:12px">تأكيد كلمة المرور</label>
+      <input class="auth-input" id="studentPassword2" type="password" autocomplete="new-password" minlength="6" placeholder="••••••••">
+      <div class="password-note">تنبيه: في حالة نسيان كلمة المرور لن تستطيع استرجاعها من داخل المنصة، لذلك احفظها في مكان آمن.</div>
+      <div class="auth-error" id="studentError"></div>
+      <div class="auth-actions"><button class="secondary-action" type="button" data-back="stepRole">رجوع</button><button class="primary-action" id="studentRegister" type="button">تسجيل</button></div>
+    </div>
+
+    <div class="wizard-step" id="stepTeacherSubject">
+      <div class="step-kicker">04 • الاختصاص</div>
+      <h2 class="step-title">ما هي <span>مادتك؟</span></h2>
+      <p class="step-description">اختر المادة التي تدرّسها. ستُراجع الإدارة طلبك قبل تفعيل صلاحية النشر.</p>
+      <div class="subject-options" id="signupSubjectOptions"></div>
+      <div class="auth-error" id="teacherSubjectError"></div>
+      <div class="auth-actions"><button class="secondary-action" type="button" data-back="stepRole">رجوع</button><button class="primary-action" id="teacherSubjectNext" type="button">التالي</button></div>
+    </div>
+
+    <div class="wizard-step" id="stepTeacherPassword">
+      <div class="step-kicker">05 • حماية الحساب</div>
+      <h2 class="step-title">عيّن <span>كلمة مرورك</span></h2>
+      <p class="step-description">بعد التسجيل سيبقى حسابك قيد المراجعة ولن تتمكن من النشر أو رؤية المحتويات حتى موافقة الإدارة.</p>
+      <label class="field-label" for="teacherPassword">كلمة المرور</label>
+      <input class="auth-input" id="teacherPassword" type="password" autocomplete="new-password" minlength="6" placeholder="••••••••">
+      <label class="field-label" for="teacherPassword2" style="margin-top:12px">تأكيد كلمة المرور</label>
+      <input class="auth-input" id="teacherPassword2" type="password" autocomplete="new-password" minlength="6" placeholder="••••••••">
+      <div class="password-note">تنبيه: في حالة نسيان كلمة المرور لن تستطيع استرجاعها من داخل المنصة، لذلك احتفظ بها بعناية.</div>
+      <div class="auth-error" id="teacherError"></div>
+      <div class="auth-actions"><button class="secondary-action" type="button" data-back="stepTeacherSubject">رجوع</button><button class="primary-action" id="teacherRegister" type="button">تسجيل</button></div>
+    </div>
+
+    <div class="wizard-step" id="stepLogin">
+      <div class="step-kicker">الدخول</div>
+      <h2 class="step-title">مرحبًا <span>بعودتك</span></h2>
+      <p class="step-description">أدخل الاسم واللقب وكلمة المرور للمتابعة.</p>
+      <label class="field-label" for="loginName">الاسم واللقب</label>
+      <input class="auth-input" id="loginName" type="text" autocomplete="username" placeholder="اسمك ولقبك">
+      <label class="field-label" for="loginPassword" style="margin-top:12px">كلمة المرور</label>
+      <input class="auth-input" id="loginPassword" type="password" autocomplete="current-password" placeholder="••••••••">
+      <div class="auth-error" id="loginError"></div>
+      <div class="auth-actions"><button class="secondary-action" id="backFromLogin" type="button">رجوع</button><button class="primary-action" id="loginBtn" type="button">دخول</button></div>
+      <div class="auth-note">لا توجد خدمة لاسترجاع كلمة المرور من داخل المنصة. احتفظ بها في مكان آمن.</div>
+    </div>
+
+    <div class="auth-note">المحتوى التعليمي والصلاحيات لا تُفتح إلا بعد موافقة الإدارة.</div>
+  </div>
+</section>
+
+<!-- ======================= شاشة انتظار الموافقة ======================= -->
+<section id="approvalScreen">
+  <div class="approval-shell">
+    <div class="approval-icon" id="approvalIcon">⌛</div>
+    <h2 id="approvalGreeting">مرحبًا بك</h2>
+    <h3 id="approvalTitle">طلبك قيد المراجعة</h3>
+    <p id="approvalMessage">عليك انتظار موافقة الإدارة لرؤية محتوى المنصة.</p>
+    <div class="approval-status" id="approvalStatus">الحالة: في انتظار موافقة الإدارة.</div>
+    <p class="pending-request" id="approvalRequestInfo"></p>
+    <div class="approval-actions">
+      <button type="button" id="approvalRefreshBtn">تحديث الحالة</button>
+      <button type="button" id="approvalLogoutBtn">تسجيل الخروج</button>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= الصفحة الرئيسية ======================= -->
+<div class="container" id="mainPage">
+<header>
+  <div class="top">
+    <div>
+      <div class="badge"><i></i> BAC • 2026 / 2027</div>
+      <h1>3 تقني رياضي <span>— بكالوريا</span></h1>
+      <p class="subtitle">لا يخيب الله عبده إذا سعى . إذا إجتهدنا فكلنا نستحق البكالوريا </p>
+    </div>
+
+  </div>
+  <div class="countdown-box">
+    <div class="countdown" id="countdown">-- يوم --:--:--</div>
+    <div class="date" id="examDate">13 جوان 2027</div>
+  </div>
+</header>
+
+<div class="account-bar" id="accountBar">
+  <div class="account-main">
+    <div class="avatar-mini" id="accountAvatar">؟</div>
+    <div>
+      <div class="account-name" id="accountName">—</div>
+      <div class="account-role" id="accountRole">—</div>
+    </div>
+  </div>
+  <div class="account-actions">
+    <button type="button" id="openWorkspaceBtn" class="teacher-btn" style="display:none">لوحة الأستاذ</button>
+    <button type="button" id="openAdminBtn" class="admin-btn" style="display:none">الإدارة</button>
+    <button type="button" id="logoutBtn">تسجيل الخروج</button>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="card"><div class="n">35</div><p>حصة أسبوعية</p></div>
+  <div class="card"><div class="n">10</div><p>مواد دراسية</p></div>
+  <div class="card"><div class="n">5</div><p>أيام دراسة</p></div>
+  <div class="card"><div class="n">Bac</div><p>الهدف: كلنا ناجحون إن شاء الله </p></div>
+</div>
+
+<section class="home-sections section-block" id="homeSections">
+  <div class="section-block-head">
+    <div>
+      <span class="eyebrow">PLATFORM SECTIONS</span>
+      <h3>أقسام المنصة</h3>
+    </div>
+    <small>اختر القسم الذي تريد الدخول إليه</small>
+  </div>
+
+  <button type="button" class="section-card featured-section" id="openScheduleBtn">
+    <div class="section-card-icon">⌁</div>
+    <div class="section-card-body">
+      <span class="eyebrow">SCHEDULE</span>
+      <h3>عرض استعمال الزمن</h3>
+      <p>فتح صفحة مستقلة تحتوي على استعمال الزمن كاملاً حسب أيام الأسبوع.</p>
+    </div>
+    <span class="section-card-arrow">←</span>
+  </button>
+</section>
+
+<section class="materials-live section-block" id="materialsSection">
+  <div class="section-title">
+    <div>
+      <span class="eyebrow">SUBJECTS</span>
+      <h2>أقسام المواد</h2>
+    </div>
+    <small>كل مادة تفتح في صفحة مستقلة خاصة بها</small>
+  </div>
+  <div class="subject-section-grid" id="subjectSectionGrid"></div>
+</section>
+
+<!-- ======================= نهاية الصفحة الرئيسية ======================= -->
+
+<div class="section-title"><h2></h2></div>
+<div class="notice"></div>
+
+<footer>التقنيون</footer>
+</div>
+
+<!-- ======================= صفحة القسم المستقلة ======================= -->
+<div class="container page-view" id="sectionPage">
+  <div class="page-header section-page-header">
+    <div>
+      <span class="eyebrow" id="sectionPageEyebrow">SECTION</span>
+      <h2 id="sectionPageTitle">—</h2>
+      <span id="sectionPageTag" style="font-size:12px;color:var(--muted);display:block;margin-top:5px;">—</span>
+    </div>
+    <button class="back-btn-main" id="sectionBackBtn">
+      <span>↩</span> الرجوع إلى الرئيسية
+    </button>
+  </div>
+  <div class="section-page-content" id="sectionPageContent"></div>
+</div>
+
+<!-- ======================= لوحة الأستاذ / الإدارة ======================= -->
+<div class="container page-view" id="workspacePage">
+  <div class="workspace-top">
+    <div>
+      <span class="eyebrow">TEACHER / ADMIN WORKSPACE</span>
+      <h2>لوحة التحكم</h2>
+      <p style="color:var(--muted);font-size:11px;margin-top:6px">إدارة المحتوى وصلاحيات الأساتذة.</p>
+    </div>
+    <button type="button" class="back-btn-main" id="workspaceBackBtn"><span>↩</span> العودة للمنصة</button>
+  </div>
+
+  <div class="workspace-grid">
+    <section class="workspace-card" id="teacherPublishCard" style="display:none">
+      <h3 id="teacherPublishTitle">قسم مادتي</h3>
+      <p id="teacherPublishDescription">هذا هو القسم الخاص بالمادة التي تم اعتمادك للتدريس فيها.</p>
+      <div class="workspace-subject-content">
+        <h4 id="teacherWorkspaceSubject">—</h4>
+        <p id="teacherWorkspaceSectionText" class="workspace-note">قسم المادة الخاص بك موجود ضمن «أقسام المواد» في الصفحة الرئيسية. افتحه لعرض المحتوى المنشور.
+        </p>
+        <button type="button" id="teacherOpenOwnSectionBtn" class="primary-action" style="margin-top:10px">فتح قسم مادتي</button>
+      </div>
+      <div class="teacher-publish-box" style="margin-top:14px">
+        <div class="publish-head"><div><span class="eyebrow">PUBLISH CONTENT</span><h4>إضافة ملف أو صورة</h4></div><span class="publish-limit">PDF / JPG / PNG • حتى 50MB</span></div>
+        <div class="publish-grid">
+          <label>عنوان المحتوى<input id="publishTitle" class="auth-input" maxlength="100" placeholder="مثال: درس الحركة"></label>
+          <label>وصف مختصر<textarea id="publishDescription" class="auth-input" rows="3" maxlength="500" placeholder="اكتب وصفًا مختصرًا للمحتوى"></textarea></label>
+          <label>المادة<select id="teacherPublishSubject" class="auth-input"></select></label>
+          <label>الملف<input id="publishFile" class="auth-input" type="file" accept="*/*"></label>
+        </div>
+        <div id="publishFileInfo" class="publish-file-info">اختر ملفًا من جهازك.</div>
+        <div class="publish-actions"><button type="button" id="publishMaterialBtn" class="primary-action">نشر المحتوى</button><span id="publishProgress" class="publish-progress"></span></div>
+        <div id="publishError" class="auth-error"></div>
+      </div>
+    </section>
+
+    <section class="workspace-card" id="adminCard" style="display:none">
+      <h3>إدارة التلاميذ والأساتذة</h3>
+      <p>كل حساب منظم داخل قسم مستقل: التلاميذ، الأساتذة، والمديرون. الموافقة والصلاحيات والحذف من المنصة لا يغيّرها إلا المدير.</p>
+      <div class="admin-sections" id="adminSections">
+        <section class="admin-group"><div class="admin-group-head"><h4>طلبات التلاميذ</h4><span id="studentRequestsCount">0 طلب</span></div><div class="admin-user-list" id="studentRequestsList"></div></section>
+        <section class="admin-group"><div class="admin-group-head"><h4>الأساتذة</h4><span id="teacherRequestsCount">0 أستاذ</span></div><div class="admin-user-list" id="teacherRequestsList"></div></section>
+        <section class="admin-group"><div class="admin-group-head"><h4>المديرون</h4><span id="adminUsersCount">0 مدير</span></div><div class="admin-user-list" id="adminUsersList"></div></section>
+      </div>
+    </section>
+  </div>
+</div>
+
+
+<!-- ======================= عارض الملفات ======================= -->
+<div class="file-modal" id="fileModal" aria-hidden="true">
+  <div class="file-modal-backdrop" id="fileModalBackdrop"></div>
+  <div class="file-modal-card" role="dialog" aria-modal="true">
+    <div class="file-modal-head"><div><span class="eyebrow">FILE PREVIEW</span><h3 id="fileModalTitle">—</h3></div><button type="button" id="fileModalClose" class="back-btn-main">إغلاق</button></div>
+    <div class="file-modal-body" id="fileModalBody"></div>
+  </div>
+</div>
+
+<script>
+/* ==================== العد التنازلي للبكالوريا ==================== */
+const examDate = new Date('2027-06-13T00:00:00').getTime();
+
+function updateCountdown() {
+  const now = new Date().getTime();
+  const distance = examDate - now;
+
+  if (distance < 0) {
+    document.getElementById('countdown').innerHTML = 'انتهى الوقت!';
+    return;
+  }
+
+  const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  document.getElementById('countdown').innerHTML =
+    `${days} يوم <span>${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}</span>`;
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+
+/* ==================== جدول استعمال الزمن ==================== */
+window.scheduleData = {
+ "الأحد":[
+  ["08:00 — 09:00","هندسة","هندسة" ,"civil"],
+  ["09:00 — 10:00","رياضيات","رياضيات","math"],
+  ["10:00 — 11:00","فيزياء","فيزياء","phys"],
+  ["11:00 — 12:00","فيزياء","فيزياء","phys"],
+  ["13:30 — 14:30","الفرنسية","Français","fr"],
+  ["14:30 — 15:30","التربية البدنية","تربية بدنية","pe"],
+  ["15:30 — 16:30","التربية البدنية","تربية بدنية","pe"]
+ ],
+ "الإثنين":[
+  ["08:00 — 09:00","رياضيات","رياضيات","math"],
+  ["09:00 — 10:00","رياضيات","رياضيات","math"],
+  ["10:00 — 11:00","هندسة","تخصص","civil"],
+  ["11:00 — 12:00","هندسة","تخصص","civil"],
+  ["13:30 — 14:30","اللغة العربية","لغة عربية","arabic"],
+  ["14:30 — 15:30","فيزياء","فيزياء","phys"],
+  ["15:30 — 16:30","الإنجليزية","English","english"]
+ ],
+ "الثلاثاء":[
+  ["08:00 — 09:00","هندسة","تخصص","civil"],
+  ["09:00 — 10:00","هندسة","تخصص","civil"],
+  ["10:00 — 11:00","اللغة العربية","لغة عربية","arabic"],
+  ["11:00 — 12:00","الفرنسية","Français","fr"],
+  ["13:30 — 14:30","رياضيات","رياضيات","math"],
+  ["14:30 — 15:30","رياضيات","رياضيات","math"],
+  ["15:30 — 16:30","التربية الإسلامية","إسلامية","islam"]
+ ],
+ "الأربعاء":[
+  ["08:00 — 09:00","رياضيات","رياضيات","math"],
+  ["09:00 — 10:00","رياضيات","رياضيات","math"],
+  ["10:00 — 11:00","الفلسفة","philosophy","فلسفة"],
+  ["11:00 — 12:00","اللغة العربية","لغة عربية","arabic"],
+  ["13:30 — 14:30","التربية الإسلامية","إسلامية","islam"],
+  ["14:30 — 15:30","التاريخ والجغرافيا","تاريخ وجغرافيا","hist"],
+  ["15:30 — 16:30","الإنجليزية","English","english"]
+ ],
+ "الخميس":[
+  ["08:00 — 09:00","فيزياء","فيزياء","phys"],
+  ["09:00 — 10:00","فيزياء","فيزياء","phys"],
+  ["10:00 — 11:00","الإنجليزية","English","english"],
+  ["11:00 — 12:00","الفرنسية","Français","fr"],
+  ["13:30 — 14:30","الفلسفة","فلسفة","philosophy"],
+  ["14:30 — 15:30","التاريخ والجغرافيا","تاريخ وجغرافيا","hist"],
+  ["15:30 — 16:30","لا توجد حصة","—","empty"]
+ ]
+};
+
+</script>
+
+<script type="module">
+/* ================================================================
+   Firebase layer
+   Replace firebaseConfig below with the config from Firebase Console.
+   SDK version follows the current Firebase browser-module setup.
+================================================================ */
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+import {
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+  onAuthStateChanged, signOut, updateProfile, deleteUser
+} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, addDoc, collection,
+  getDocs, query, where, limit, serverTimestamp, deleteDoc, onSnapshot
+} from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js';
+const firebaseConfig = {
+  apiKey: "AIzaSyA-wdEpnn3KPXuofUseM7RJaq3FsmYufmA",
+  authDomain: "math-tequenique.firebaseapp.com",
+  projectId: "math-tequenique",
+  messagingSenderId: "899071088762",
+  appId: "1:899071088762:web:2be384ecb34a64b3e583c3",
+  measurementId: "G-6JSM2S4SC1"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* ================================================================
+   Supabase Storage — Easy Mode
+   الرفع والعرض يتمان مباشرة عبر Bucket عام، بدون Firebase Functions أو JWT/Claims.
+================================================================ */
+const SUPABASE_URL = 'https://lhfrpzwaopsdxlobrkak.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2gdb8biZTQZG7vM2kJ0FzA__DGB-6wy';
+const STORAGE_BUCKET = 'platform-files';
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+const supabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY);
+
+// وضع التشغيل السهل:
+// Supabase Storage هو مساحة عامة للعرض/التنزيل، والرفع يتم مباشرة من المتصفح.
+// لا نعتمد على Firebase Custom Claims ولا Firebase Functions ولا Signed URLs.
+let currentUser = null;
+let currentProfile = null;
+let selectedMaterialSubject = 'math';
+let materialCache = new Map();
+let profileUnsubscribe = null;
+let registrationName = '';
+let registrationRole = '';
+let registrationSubjects = [];
+let appReady = false;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+});
+
+window.debugFirebaseSupabaseAuth = function(){
+  return 'وضع التخزين السهل مفعّل: Supabase لا يعتمد على Firebase JWT لرفع الملفات.';
+};
+
+const SUBJECTS = [
+  ['math','الرياضيات'],['physics','الفيزياء'],['engineering','الهندسة'],
+  ['arabic','اللغة العربية'],['french','الفرنسية'],['english','الإنجليزية'],
+  ['history','التاريخ والجغرافيا'],['islamic','التربية الإسلامية'],
+  ['philosophy','الفلسفة'],['pe','التربية البدنية']
+];
+const SUBJECT_MAP = Object.fromEntries(SUBJECTS);
+
+const $ = (id) => document.getElementById(id);
+
+function normalizeName(value){
+  return String(value || '').trim().replace(/\s+/g,' ').replace(/[\/\\#?]/g,'-');
+}
+function nameHash(value){
+  let h = 2166136261;
+  for(const ch of value){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); }
+  return (h >>> 0).toString(36);
+}
+function userIndexKey(role,name){ return `${role}_${nameHash(normalizeName(name).toLowerCase())}`; }
+function authInternalEmail(role,name){ return `${userIndexKey(role,name)}@math-tequenique.firebaseapp.com`; }
+function renderSignupSubjects(){
+  $('signupSubjectOptions').innerHTML = SUBJECTS.map(([key,name]) => `
+    <label class="subject-option"><input type="radio" name="teacherSubject" value="${key}"> ${name}</label>
+  `).join('');
+}
+function selectedTeacherSubject(){ return document.querySelector('#signupSubjectOptions input:checked')?.value || ''; }
+function accountTypeLabel(type){ return type === 'teacher' ? 'أستاذ' : 'تلميذ'; }
+function isApprovedProfile(profile){ return profile?.role === 'admin' || profile?.status === 'approved'; }
+
+function renderApprovalScreen(){
+  const name = currentProfile?.name || currentUser?.displayName || 'مستخدم';
+  const status = currentProfile?.status || 'pending';
+  const requestType = currentProfile?.requestType || (currentProfile?.role === 'teacher' ? 'teacher' : 'student');
+  const subjects = normalizeSubjects(currentProfile?.requestedSubjects?.length ? currentProfile.requestedSubjects : currentProfile?.subjects);
+  $('approvalGreeting').textContent = `مرحبًا ${name} 👋`;
+  $('approvalRequestInfo').textContent = requestType === 'teacher'
+    ? `نوع الحساب: أستاذ • المادة: ${subjects.length ? subjects.map(s => SUBJECT_MAP[s]).join('، ') : 'غير محددة'}`
+    : 'نوع الحساب: تلميذ';
+  const statusBox = $('approvalStatus');
+  statusBox.className = 'approval-status';
+  if(status === 'approved' || currentProfile?.role === 'admin'){
+    $('approvalIcon').textContent='✓'; statusBox.classList.add('approved');
+    $('approvalTitle').textContent='تمت الموافقة على حسابك';
+    $('approvalMessage').textContent='سيتم فتح المنصة لك الآن.';
+    statusBox.textContent='الحالة: الحساب مقبول.';
+  }else if(status === 'rejected'){
+    $('approvalIcon').textContent='!'; statusBox.classList.add('rejected');
+    $('approvalTitle').textContent='لم تتم الموافقة على الحساب';
+    $('approvalMessage').textContent='يمكنك التواصل مع الإدارة لمعرفة سبب الرفض.';
+    statusBox.textContent='الحالة: تم رفض الطلب من الإدارة.';
+  }else{
+    $('approvalIcon').textContent='⌛';
+    $('approvalTitle').textContent='طلبك قيد المراجعة';
+    $('approvalMessage').textContent = requestType === 'teacher'
+      ? 'عليك انتظار الموافقة من الإدارة حتى تتمكن من رؤية المحتويات والنشر في مادتك.'
+      : 'عليك انتظار الموافقة من الإدارة لرؤية محتويات المنصة.';
+    statusBox.textContent='الحالة: في انتظار موافقة الإدارة.';
+  }
+}
+function applyAccessState(){
+  const approved = isApprovedProfile(currentProfile);
+  if(!appReady) return;
+  document.body.classList.toggle('approval-required', !approved);
+  if(approved){
+    document.body.classList.remove('auth-required');
+    $('approvalScreen').style.display='none'; $('authScreen').style.display='none';
+    $('splashScreen').classList.add('hide');
+    renderAccount(); renderWorkspace(); renderMaterialSubjects();
+  }else{
+    document.body.classList.add('approval-required'); document.body.classList.remove('auth-required');
+    $('authScreen').style.display='none'; $('approvalScreen').style.display='grid';
+    renderApprovalScreen();
+  }
+}
+function roleLabel(role){ return role === 'admin' ? 'مدير المنصة' : role === 'teacher' ? 'أستاذ' : 'تلميذ'; }
+function normalizeSubjects(value){ return Array.isArray(value) ? value.filter(x => SUBJECT_MAP[x]) : []; }
+function safeFileName(name){
+  return String(name||'file').normalize('NFKD').replace(/[^\w.\- ]+/g,'').trim().replace(/\s+/g,'-').replace(/-+/g,'-').slice(0,90) || 'file';
+}
+function fileKind(file){
+  if(!file) return '';
+  if(file.type === 'application/pdf' || /\.pdf$/i.test(file.name||'')) return 'pdf';
+  if(file.type.startsWith('image/')) return 'image';
+  return 'file';
+}
+function formatBytes(bytes){
+  if(bytes < 1024) return `${bytes} B`;
+  if(bytes < 1024*1024) return `${(bytes/1024).toFixed(1)} KB`;
+  return `${(bytes/1024/1024).toFixed(1)} MB`;
+}
+function friendlyStorageError(error){
+  const msg=String(error?.message||'');
+  const low=msg.toLowerCase();
+  if(low.includes('row-level security')) return 'تعذر رفع الملف إلى Supabase. تأكد من تشغيل ملف supabase_easy_setup.sql مرة واحدة وأن Bucket اسمه platform-files.';
+  if(low.includes('bucket') || low.includes('not found')) return 'مساحة التخزين platform-files غير موجودة. شغّل ملف supabase_easy_setup.sql مرة واحدة.';
+  if(error?.statusCode) return `خطأ التخزين (${error.statusCode}): ${msg || 'تعذر تنفيذ العملية.'}`;
+  return msg || 'تعذر تنفيذ عملية التخزين.';
+}
+function friendlyAuthError(code){
+  const map={
+    'auth/invalid-credential':'الاسم أو كلمة المرور غير صحيحة.','auth/invalid-email':'تعذر إنشاء الحساب.','auth/email-already-in-use':'هذا الاسم مسجل مسبقًا.','auth/weak-password':'كلمة المرور يجب أن تكون 6 أحرف على الأقل.','auth/too-many-requests':'تم إيقاف المحاولات مؤقتًا. حاول لاحقًا.','auth/network-request-failed':'تعذر الاتصال. تحقق من الإنترنت.'
+  }; return map[code] || 'حدث خطأ غير متوقع. حاول مرة أخرى.';
+}
+function setProgress(index){ document.querySelectorAll('#authProgress span').forEach((s,i)=>s.classList.toggle('active',i<=index)); }
+const stepIds=['stepEntryChoice','stepName','stepWelcome','stepRole','stepStudentPassword','stepTeacherSubject','stepTeacherPassword','stepLogin'];
+function showStep(id){
+  document.querySelectorAll('.wizard-step').forEach(x=>x.classList.remove('active'));
+  $(id).classList.add('active');
+  const map={stepEntryChoice:0,stepName:0,stepWelcome:1,stepRole:2,stepStudentPassword:3,stepTeacherSubject:3,stepTeacherPassword:4,stepLogin:0};
+  setProgress(map[id] ?? 0);
+}
+function showAuthChoice(){
+  document.body.classList.add('auth-required'); document.body.classList.remove('approval-required');
+  $('authScreen').style.display='grid'; $('approvalScreen').style.display='none'; $('splashScreen').classList.add('hide');
+  showStep('stepEntryChoice');
+}
+function showRegistration(){
+  document.body.classList.add('auth-required'); document.body.classList.remove('approval-required');
+  $('authScreen').style.display='grid'; $('approvalScreen').style.display='none'; $('splashScreen').classList.add('hide');
+  $('authError').textContent=''; $('studentError').textContent=''; $('teacherError').textContent='';
+  showStep('stepName'); $('regName').focus();
+}
+function showLogin(){
+  document.body.classList.add('auth-required'); document.body.classList.remove('approval-required');
+  $('authScreen').style.display='grid'; $('approvalScreen').style.display='none'; $('splashScreen').classList.add('hide');
+  $('loginError').textContent=''; showStep('stepLogin'); $('loginName').focus();
+}
+function validatePassword(a,b){
+  if(a.length < 6) return 'كلمة المرور يجب أن تكون 6 أحرف على الأقل.';
+  if(a !== b) return 'كلمتا المرور غير متطابقتين.';
+  return '';
+}
+
+$('nameNext').addEventListener('click',()=>{
+  const name=normalizeName($('regName').value);
+  $('authError').textContent='';
+  if(name.length<3){ $('authError').textContent='أدخل اسمك ولقبك بشكل صحيح.'; return; }
+  registrationName=name; $('welcomeName').textContent=name; showStep('stepWelcome');
+  setTimeout(()=>showStep('stepRole'),1400);
+});
+$('regName').addEventListener('keydown',e=>{if(e.key==='Enter')$('nameNext').click()});
+$('startSignupBtn').addEventListener('click',showRegistration);
+$('startLoginBtn').addEventListener('click',showLogin);
+$('backFromSignup').addEventListener('click',showAuthChoice);
+$('backFromLogin').addEventListener('click',showAuthChoice);
+document.querySelectorAll('[data-role]').forEach(btn=>btn.addEventListener('click',()=>{
+  registrationRole=btn.dataset.role;
+  if(registrationRole==='student') showStep('stepStudentPassword'); else showStep('stepTeacherSubject');
+}));
+document.querySelectorAll('[data-back]').forEach(btn=>btn.addEventListener('click',()=>showStep(btn.dataset.back)));
+$('teacherSubjectNext').addEventListener('click',()=>{
+  $('teacherSubjectError').textContent=''; const subject=selectedTeacherSubject();
+  if(!subject){$('teacherSubjectError').textContent='اختر المادة التي تدرّسها أولاً.';return;}
+  registrationSubjects=[subject]; showStep('stepTeacherPassword');
+});
+
+async function registerAccount(role,password,password2){
+  const errorEl = role==='teacher' ? $('teacherError') : $('studentError');
+  errorEl.textContent='';
+  const err=validatePassword(password,password2); if(err){errorEl.textContent=err;return;}
+  if(!registrationName){showStep('stepName');return;}
+  const subjects=role==='teacher'?registrationSubjects:[];
+  if(role==='teacher'&&!subjects.length){errorEl.textContent='اختر مادة واحدة على الأقل.';return;}
+  try{
+    $('studentRegister').disabled=true; $('teacherRegister').disabled=true;
+    const email=authInternalEmail(role,registrationName);
+    const indexKey=userIndexKey(role,registrationName);
+    const existingIndex=await getDoc(doc(db,'usernames',indexKey));
+    if(existingIndex.exists()) throw new Error('هذا الاسم مسجل مسبقًا. استخدم الاسم واللقب بشكل أكثر تميّزًا.');
+    const cred=await createUserWithEmailAndPassword(auth,email,password);
+    await updateProfile(cred.user,{displayName:registrationName});
+    await setDoc(doc(db,'usernames',indexKey),{uid:cred.user.uid,authEmail:email,role,name:registrationName,createdAt:serverTimestamp()});
+    const profile={
+      name:registrationName,email,role:'student',status:'pending',requestType:role,requestedSubjects:subjects,subjects:[],createdAt:serverTimestamp()
+    };
+    try{
+      await setDoc(doc(db,'users',cred.user.uid),profile);
+    }catch(profileErr){
+      await deleteDoc(doc(db,'usernames',indexKey)).catch(()=>{});
+      await deleteUser(cred.user).catch(()=>{});
+      throw profileErr;
+    }
+    currentUser=cred.user; currentProfile=profile;
+    applyAccessState();
+  }catch(err){ errorEl.textContent=err.code?friendlyAuthError(err.code):(err.message||'تعذر إنشاء الحساب.'); }
+  finally{$('studentRegister').disabled=false;$('teacherRegister').disabled=false;}
+}
+$('studentRegister').addEventListener('click',()=>registerAccount('student',$('studentPassword').value,$('studentPassword2').value));
+$('teacherRegister').addEventListener('click',()=>registerAccount('teacher',$('teacherPassword').value,$('teacherPassword2').value));
+
+$('loginBtn').addEventListener('click',async()=>{
+  const name=normalizeName($('loginName').value), password=$('loginPassword').value;
+  $('loginError').textContent='';
+  if(name.length<3){$('loginError').textContent='أدخل اسمك ولقبك.';return;}
+  if(!password){$('loginError').textContent='أدخل كلمة المرور.';return;}
+  try{
+    $('loginBtn').disabled=true;
+    let entry=null;
+    for(const role of ['student','teacher','admin']){
+      const snap=await getDoc(doc(db,'usernames',userIndexKey(role,name)));
+      if(snap.exists()){ entry=snap.data(); break; }
+    }
+    if(!entry) throw new Error('لم نجد حسابًا بهذا الاسم.');
+    await signInWithEmailAndPassword(auth,entry.authEmail,password);
+  }catch(err){$('loginError').textContent=err.code?friendlyAuthError(err.code):err.message;}
+  finally{$('loginBtn').disabled=false;}
+});
+$('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
+
+$('logoutBtn').addEventListener('click', () => signOut(auth));
+$('approvalLogoutBtn').addEventListener('click', () => signOut(auth));
+$('approvalRefreshBtn').addEventListener('click', async () => {
+  if(!currentUser) return;
+  try{
+    const snap = await getDoc(doc(db,'users',currentUser.uid));
+    if(snap.exists()){ currentProfile = snap.data(); applyAccessState(); }
+  }catch(err){ alert('تعذر تحديث الحالة. حاول مرة أخرى.'); }
+});
+
+async function loadProfile(user){
+  const snap = await getDoc(doc(db,'users',user.uid));
+  if(snap.exists()) return snap.data();
+  // Recovery for an Auth user without a profile document.
+  const profile = {name:user.displayName || 'مستخدم جديد', email:user.email || '', role:'student', status:'pending', requestType:'student', requestedSubjects:[], subjects:[], createdAt:serverTimestamp()};
+  await setDoc(doc(db,'users',user.uid), profile);
+  return profile;
+}
+
+function renderAccount(){
+  $('accountName').textContent = currentProfile.name || currentUser.displayName || currentUser.email;
+  $('accountRole').textContent = roleLabel(currentProfile.role);
+  $('accountAvatar').textContent = (currentProfile.name || '؟').trim().charAt(0) || '؟';
+  const staff = currentProfile.role === 'teacher' || currentProfile.role === 'admin';
+  $('openWorkspaceBtn').style.display = staff ? 'inline-block' : 'none';
+  $('openAdminBtn').style.display = currentProfile.role === 'admin' ? 'inline-block' : 'none';
+}
+
+function showMain(){
+  $('workspacePage').classList.remove('active');
+  $('sectionPage').classList.remove('active');
+  $('mainPage').style.display = 'block';
+  window.scrollTo(0,0);
+}
+function showWorkspace(){
+  if(!isApprovedProfile(currentProfile)) return;
+  $('mainPage').style.display = 'none';
+  $('sectionPage').classList.remove('active');
+  $('workspacePage').classList.add('active');
+  window.scrollTo(0,0);
+  renderWorkspace();
+}
+$('workspaceBackBtn').addEventListener('click', showMain);
+$('openWorkspaceBtn').addEventListener('click', showWorkspace);
+$('openAdminBtn').addEventListener('click', showWorkspace);
+
+/* ==================== فتح الصفحات المستقلة ==================== */
+function openSchedulePage(){
+  if(!isApprovedProfile(currentProfile)) return;
+  $('mainPage').style.display='none';
+  $('workspacePage').classList.remove('active');
+  $('sectionPage').classList.add('active');
+  $('sectionPageEyebrow').textContent='WEEKLY SCHEDULE';
+  $('sectionPageTitle').textContent='استعمال الزمن';
+  $('sectionPageTag').textContent='البرنامج الأسبوعي الكامل';
+
+  const days = Object.entries(window.scheduleData || {});
+  $('sectionPageContent').innerHTML = days.map(([day, classes], index) => `
+    <section class="schedule-day-page">
+      <div class="schedule-day-head">
+        <div>
+          <span class="schedule-day-number">${String(index + 1).padStart(2,'0')}</span>
+          <h3>${escapeHtml(day)}</h3>
+        </div>
+        <span class="schedule-day-count">${classes.length} حصص</span>
+      </div>
+      <div class="schedule-page-list">
+        ${classes.map(([time, subject, desc, type]) => {
+          const parts = String(time).split(' — ');
+          const empty = type === 'empty';
+          return `
+            <article class="schedule-page-item ${escapeHtml(type)}${empty?' empty':''}">
+              <div class="schedule-page-time">
+                <b>${escapeHtml(parts[0] || '')}</b>
+                <span>${escapeHtml(parts[1] || '')}</span>
+              </div>
+              <div class="schedule-page-info">
+                <h4>${escapeHtml(subject)}</h4>
+                <p>${escapeHtml(desc || '')}</p>
+                <span>${empty ? 'فترة فارغة' : 'حصة دراسية'}</span>
+              </div>
+            </article>`;
+        }).join('')}
+      </div>
+    </section>`).join('');
+  window.scrollTo(0,0);
+}
+
+$('openScheduleBtn').addEventListener('click', openSchedulePage);
+$('sectionBackBtn').addEventListener('click', showMain);
+
+function renderWorkspace(){
+  if(!isApprovedProfile(currentProfile)){
+    $('teacherPublishCard').style.display='none';
+    $('adminCard').style.display='none';
+    return;
+  }
+  const teacher = currentProfile.role === 'teacher';
+  $('teacherPublishCard').style.display = teacher ? 'block' : 'none';
+  $('adminCard').style.display = currentProfile.role === 'admin' ? 'block' : 'none';
+
+  if(teacher){
+    const allowed = normalizeSubjects(currentProfile.subjects);
+    const subject = allowed[0] || normalizeSubjects(currentProfile.requestedSubjects)[0] || 'math';
+    $('teacherPublishTitle').textContent = `قسم ${SUBJECT_MAP[subject] || 'مادتي'}`;
+    $('teacherPublishDescription').textContent = `هذا هو القسم الخاص بمادة ${SUBJECT_MAP[subject] || 'مادتك'}، ويمكنك فتحه من الصفحة الرئيسية لرؤية المنشورات.`;
+    $('teacherWorkspaceSubject').textContent = SUBJECT_MAP[subject] || '—';
+    $('teacherOpenOwnSectionBtn').onclick = () => openSubjectPage(subject);
+    $('teacherPublishSubject').innerHTML = allowed.map(k => `<option value="${k}">${SUBJECT_MAP[k]}</option>`).join('');
+    $('teacherPublishSubject').value = subject;
+    $('publishError').textContent = '';
+    $('publishProgress').textContent = '';
+  }
+  if(currentProfile.role === 'admin') loadAdminUsers();
+}
+
+async function listMaterials(subject){
+  if(!isApprovedProfile(currentProfile)) return [];
+  if(materialCache.has(subject)) return materialCache.get(subject);
+  const q = query(collection(db,'materials'), where('subject','==',subject), limit(50));
+  const snap = await getDocs(q);
+  const rows = snap.docs.map(d => ({id:d.id,...d.data()}));
+  rows.sort((a,b)=>{
+    const at = a.createdAt?.toMillis?.() || 0, bt = b.createdAt?.toMillis?.() || 0;
+    return bt-at;
+  });
+  materialCache.set(subject,rows);
+  return rows;
+}
+
+async function renderSubjectSections(){
+  if(!isApprovedProfile(currentProfile)) return;
+  const teacherSubjects = currentProfile.role === 'teacher' ? normalizeSubjects(currentProfile.subjects) : [];
+  const counts = await Promise.all(SUBJECTS.map(async ([key,name]) => {
+    try { return [key,name,(await listMaterials(key)).length]; }
+    catch { return [key,name,0]; }
+  }));
+  $('subjectSectionGrid').innerHTML = counts.map(([key,name,count])=>{
+    const mine = teacherSubjects.includes(key);
+    return `<button type="button" class="subject-section-card ${mine?'teacher-owner':''}" data-open-subject-section="${key}">
+      <div class="subject-section-head"><h4>قسم ${name}</h4><span>${count} ملف</span></div>
+      <p>${mine ? 'قسم مادّتك المعتمد. تجد هنا المنشورات الخاصة بالمادة.' : 'قسم المادة ومحتواها التعليمي المنشور.'}</p>
+      <div class="subject-section-meta">فتح القسم في صفحة مستقلة ←</div>
+    </button>`;
+  }).join('');
+  document.querySelectorAll('[data-open-subject-section]').forEach(btn=>btn.addEventListener('click',()=>openSubjectPage(btn.dataset.openSubjectSection)));
+}
+
+window.openSubjectPage = async function(subject){
+  if(!isApprovedProfile(currentProfile)) return;
+  const name = SUBJECT_MAP[subject] || 'المادة';
+  const mine = currentProfile.role==='teacher' && normalizeSubjects(currentProfile.subjects).includes(subject);
+  $('sectionPageEyebrow').textContent='SUBJECT';
+  $('sectionPageTitle').textContent=`قسم ${name}`;
+  $('sectionPageTag').textContent = mine ? 'قسم المادة المعتمد لك' : 'المحتوى التعليمي والمنشورات';
+  $('sectionPageContent').innerHTML=`
+    <section class="subject-page-intro ${mine?'mine':''}">
+      <div><span class="subject-page-icon">${name.charAt(0)}</span></div>
+      <div><h3>${name}</h3><p>${mine?'هذا هو قسمك المعتمد. سيظهر هنا كل محتوى تنشره في هذه المادة مباشرة.':'تجد هنا المحتوى المنشور من الأساتذة في هذه المادة.'}</p></div>
+    </section>
+    <section class="subject-page-materials">
+      <div class="subject-page-material-head"><div><span class="eyebrow">CONTENT</span><h3>محتوى القسم</h3></div><span id="subjectPageCount">—</span></div>
+      <div id="subjectPageMaterialList" class="material-list"><div class="empty-state">جاري تحميل المحتوى...</div></div>
+    </section>`;
+  mainPage.style.display='none';
+  $('workspacePage').classList.remove('active');
+  $('sectionPage').classList.add('active');
+  window.scrollTo(0,0);
+  try{
+    const rows = await listMaterials(subject);
+    $('subjectPageCount').textContent = `${rows.length} ملف`;
+    const listEl=$('subjectPageMaterialList');
+    listEl.innerHTML = rows.length ? rows.map(m=>`
+      <article class="material-item subject-page-material">
+        <div class="material-item-main">
+          <h4>${escapeHtml(m.title || m.fileName || 'منشور')}</h4>
+          <p>${escapeHtml(m.description || 'لا يوجد وصف لهذا المنشور.')}</p>
+          <div class="material-meta">الأستاذ: ${escapeHtml(m.teacherName || '—')} • ${formatDate(m.createdAt)}</div>
+        </div>
+        <div class="material-actions">
+          ${(m.filePath || m.fileUrl) ? `<button type="button" class="material-open" data-open-material="${m.id}">عرض</button><button type="button" class="material-open" data-download-material="${m.id}">تنزيل</button>` : `<span class="subject-tag">لا يوجد ملف مرتبط حاليًا</span>`}
+          ${m.teacherUid === currentUser?.uid || currentProfile?.role === 'admin' ? `<button type="button" class="material-delete" data-delete-material="${m.id}">حذف</button>` : ''}
+        </div>
+      </article>`).join('') : '<div class="empty-state">لا يوجد محتوى منشور في هذه المادة حتى الآن.</div>';
+    listEl.querySelectorAll('[data-open-material]').forEach(btn=>btn.addEventListener('click',()=>openMaterial(btn.dataset.openMaterial,subject)));
+    listEl.querySelectorAll('[data-download-material]').forEach(btn=>btn.addEventListener('click',()=>downloadMaterial(btn.dataset.downloadMaterial,subject)));
+    listEl.querySelectorAll('[data-delete-material]').forEach(btn=>btn.addEventListener('click',()=>removeMaterial(btn.dataset.deleteMaterial,subject)));
+  }catch(err){
+    $('subjectPageMaterialList').innerHTML='<div class="empty-state">تعذر تحميل محتوى المادة.</div>';
+  }
+};
+
+async function renderMaterialSubjects(){
+  return renderSubjectSections();
+}
+
+function createMaterialPublicUrl(material, download=false){
+  if(!supabaseConfigured || !material?.filePath) return null;
+  const bucket = material.storageBucket || STORAGE_BUCKET;
+  const {data} = supabase.storage.from(bucket).getPublicUrl(material.filePath);
+  let url = data?.publicUrl || null;
+  if(url && download){
+    const u = new URL(url);
+    u.searchParams.set('download', material.fileName || 'file');
+    url = u.toString();
+  }
+  return url;
+}
+
+async function previewMaterial(id, subject){
+  const rows = await listMaterials(subject);
+  const material = rows.find(x=>x.id===id);
+  if(!material) return;
+  if(material.fileUrl){ window.open(material.fileUrl,'_blank','noopener,noreferrer'); return; }
+  if(!supabaseConfigured || !material.filePath){ alert('هذا الملف غير مربوط بالتخزين بعد.'); return; }
+  try{
+    const url = createMaterialPublicUrl(material,false);
+    if(!url) throw new Error('تعذر إنشاء رابط المعاينة.');
+    $('fileModalTitle').textContent = material.title || material.fileName || 'ملف';
+    const body=$('fileModalBody');
+    if(material.kind==='image' || String(material.fileType||'').startsWith('image/')){
+      body.innerHTML=`<img class="file-preview-image" src="${url}" alt="${escapeHtml(material.title||'صورة')}">`;
+    }else if(material.kind==='pdf' || material.fileType==='application/pdf' || /\.pdf$/i.test(material.fileName||'')){
+      body.innerHTML=`<iframe class="file-preview-pdf" src="${url}" title="${escapeHtml(material.title||'PDF')}"></iframe>`;
+    }else{
+      body.innerHTML=`<div style="text-align:center;padding:30px;max-width:560px"><h3 style="margin-bottom:10px;color:var(--accent)">هذا الملف لا يمكن معاينته داخل المتصفح</h3><p style="color:var(--muted);font-size:12px;line-height:1.8">يمكنك تنزيله وفتحه بالتطبيق المناسب على جهازك.</p><a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:16px;padding:11px 16px;border:1px solid var(--accent);color:var(--accent);text-decoration:none">فتح / تنزيل الملف</a></div>`;
+    }
+    $('fileModal').classList.add('show'); $('fileModal').setAttribute('aria-hidden','false');
+  }catch(err){ alert(friendlyStorageError(err)); }
+}
+
+async function downloadMaterial(id, subject){
+  const rows = await listMaterials(subject);
+  const material = rows.find(x=>x.id===id);
+  if(!material) return;
+  if(material.fileUrl){ window.open(`${material.fileUrl}${material.fileUrl.includes('?')?'&':'?'}download=1`,'_blank','noopener,noreferrer'); return; }
+  if(!supabaseConfigured || !material.filePath){ alert('هذا الملف غير مربوط بالتخزين بعد.'); return; }
+  try{
+    const url = createMaterialPublicUrl(material,true);
+    if(url) window.open(url,'_blank','noopener,noreferrer');
+  }catch(err){ alert(friendlyStorageError(err)); }
+}
+
+function closeFileModal(){ $('fileModal').classList.remove('show'); $('fileModal').setAttribute('aria-hidden','true'); $('fileModalBody').innerHTML=''; }
+$('fileModalClose').addEventListener('click',closeFileModal);
+$('fileModalBackdrop').addEventListener('click',closeFileModal);
+
+async function uploadMaterial(){
+  if(!isApprovedProfile(currentProfile) || currentProfile.role!=='teacher'){ alert('لا تملك صلاحية النشر.'); return; }
+  if(!supabaseConfigured){ $('publishError').textContent='أكمل إعداد Supabase في أعلى ملف index.html أولًا (الرابط + publishable key).'; return; }
+  const title=String($('publishTitle').value||'').trim();
+  const description=String($('publishDescription').value||'').trim();
+  const subject=$('teacherPublishSubject').value;
+  const file=$('publishFile').files?.[0];
+  $('publishError').textContent='';
+  if(title.length<2){$('publishError').textContent='أدخل عنوان المحتوى.';return;}
+  if(!SUBJECT_MAP[subject] || !normalizeSubjects(currentProfile.subjects).includes(subject)){ $('publishError').textContent='المادة غير مسموح لك بالنشر فيها.'; return; }
+  if(!file){$('publishError').textContent='اختر أي ملف من جهازك (حتى 50MB).';return;}
+  if(!fileKind(file)){ $('publishError').textContent='اختر ملفًا من جهازك.'; return; }
+  if(file.size>MAX_FILE_SIZE){ $('publishError').textContent='حجم الملف يتجاوز 50MB.'; return; }
+  const safe=safeFileName(file.name);
+  const unique=`${Date.now()}-${crypto.randomUUID ? crypto.randomUUID().slice(0,8) : Math.random().toString(36).slice(2,10)}`;
+  const path=`${subject}/${currentUser.uid}/${unique}-${safe}`;
+  const btn=$('publishMaterialBtn');
+  try{
+    btn.disabled=true; $('publishProgress').textContent='جاري الرفع…';
+    const {error:uploadError}=await supabase.storage.from(STORAGE_BUCKET).upload(path,file,{contentType:file.type,cacheControl:'3600',upsert:false});
+    if(uploadError){
+      console.error('Supabase upload failed',{statusCode:uploadError.statusCode,code:uploadError.code,message:uploadError.message,bucket:STORAGE_BUCKET,path});
+      throw uploadError;
+    }
+    $('publishProgress').textContent='جاري حفظ المنشور…';
+    try{
+      await addDoc(collection(db,'materials'),{
+        title,description,subject,fileName:file.name,filePath:path,fileType:file.type,kind:fileKind(file),fileSize:file.size,storageBucket:STORAGE_BUCKET,teacherUid:currentUser.uid,teacherName:currentProfile.name||currentUser.displayName||'أستاذ',createdAt:serverTimestamp()
+      });
+    }catch(dbErr){
+      await supabase.storage.from(STORAGE_BUCKET).remove([path]).catch(()=>{});
+      throw dbErr;
+    }
+    materialCache.clear();
+    $('publishTitle').value=''; $('publishDescription').value=''; $('publishFile').value=''; $('publishFileInfo').textContent='تم نشر الملف بنجاح.';
+    $('publishProgress').textContent='تم النشر ✓';
+    await renderMaterialSubjects();
+    await openSubjectPage(subject);
+  }catch(err){
+    $('publishError').textContent = err?.code?.startsWith?.('storage') ? friendlyStorageError(err) : (err.message || 'تعذر نشر المحتوى.');
+  }finally{ btn.disabled=false; }
+}
+$('publishMaterialBtn').addEventListener('click',uploadMaterial);
+$('publishFile').addEventListener('change',()=>{ const f=$('publishFile').files?.[0]; $('publishFileInfo').textContent=f?`${f.name} • ${formatBytes(f.size)}`:'اختر ملفًا من جهازك.'; });
+
+async function openMaterial(id, subject){ return previewMaterial(id,subject); }
+
+async function removeMaterial(id, knownSubject=null){
+  if(!confirm('حذف هذا المنشور من المنصة؟')) return;
+  let foundSubject = knownSubject;
+  if(!foundSubject){
+    for(const subject of SUBJECTS.map(x=>x[0])){
+      const rows = await listMaterials(subject);
+      if(rows.some(x=>x.id===id)){ foundSubject=subject; break; }
+    }
+  }
+  if(!foundSubject) return;
+  try{
+    const rows = await listMaterials(foundSubject);
+    const material = rows.find(x=>x.id===id);
+    if(material?.filePath && supabaseConfigured){
+      const {error:storageError}=await supabase.storage.from(material.storageBucket || STORAGE_BUCKET).remove([material.filePath]);
+      if(storageError) console.warn('Storage removal warning:',storageError);
+    }
+    await deleteDoc(doc(db,'materials',id));
+    materialCache.delete(foundSubject);
+    await renderMaterialSubjects();
+    if($('sectionPage').classList.contains('active')) await openSubjectPage(foundSubject);
+  }catch(err){ alert('تعذر حذف المنشور.'); }
+}
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+}
+function formatDate(ts){
+  const date = ts?.toDate?.();
+  if(!date) return 'حديثاً';
+  return new Intl.DateTimeFormat('ar-DZ',{year:'numeric',month:'short',day:'numeric'}).format(date);
+}
+
+async function adminDeleteUser(uid, userInfo){
+  if(currentProfile?.role !== 'admin'){ alert('هذا الإجراء متاح للمدير فقط.'); return; }
+  if(uid === currentUser?.uid){ alert('لا يمكنك حذف حساب المدير الذي تستخدمه حاليًا من داخل اللوحة.'); return; }
+  const displayName = userInfo?.name || userInfo?.email || 'هذا الحساب';
+  const kind = userInfo?.role === 'teacher' || userInfo?.requestType === 'teacher' ? 'الأستاذ' : 'التلميذ';
+  const ok = confirm(`هل تريد حذف ${kind} «${displayName}» من المنصة؟\n\nسيتم حذف ملفه من Firestore والمنشورات المرتبطة به وإزالته من لوحة الإدارة.`);
+  if(!ok) return;
+
+  try{
+    // حذف جميع منشورات الأستاذ من Firestore (التلميذ غالبًا ليس لديه منشورات).
+    const materialsSnap = await getDocs(query(collection(db,'materials'), where('teacherUid','==',uid), limit(200)));
+    for(const materialDoc of materialsSnap.docs){
+      const material = materialDoc.data() || {};
+      if(material.filePath && supabaseConfigured){
+        // في Easy Mode قد ترفض Storage عملية الحذف لأنها مجهولة؛ نتجاهل هذا الخطأ ونكمل.
+        await supabase.storage.from(material.storageBucket || STORAGE_BUCKET).remove([material.filePath]).catch(()=>{});
+      }
+      await deleteDoc(materialDoc.ref);
+    }
+
+    // إزالة ملف المستخدم من Firestore.
+    await deleteDoc(doc(db,'users',uid));
+
+    // تنظيف مفاتيح اسم المستخدم المحتملة في جميع الأدوار.
+    const rolesToCheck=['student','teacher','admin'];
+    const normalized = normalizeName(userInfo?.name || '').toLowerCase();
+    if(normalized){
+      for(const role of rolesToCheck){
+        const key=userIndexKey(role,normalized);
+        const ref=doc(db,'usernames',key);
+        const snap=await getDoc(ref);
+        if(snap.exists() && snap.data()?.uid===uid) await deleteDoc(ref);
+      }
+    }
+
+    materialCache.clear();
+    await loadAdminUsers();
+    await renderMaterialSubjects().catch(()=>{});
+    alert(`تم حذف ${kind} من المنصة بنجاح.`);
+  }catch(err){
+    console.error('Admin delete user failed:',err);
+    alert('تعذر حذف الحساب من المنصة. حاول مرة أخرى.');
+  }
+}
+
+async function loadAdminUsers(){
+  const lists={students:$('studentRequestsList'),teachers:$('teacherRequestsList'),admins:$('adminUsersList')};
+  Object.values(lists).forEach(el=>el.innerHTML='<div class="admin-empty">جاري التحميل...</div>');
+  try{
+    const snap=await getDocs(query(collection(db,'users'),limit(200)));
+    const users=snap.docs.map(d=>({uid:d.id,...d.data()}));
+    const students=users.filter(u=>(u.role||'student')==='student' && (u.requestType||'student')==='student');
+    const teachers=users.filter(u=>(u.role==='teacher') || (u.requestType==='teacher'));
+    const admins=users.filter(u=>u.role==='admin');
+    $('studentRequestsCount').textContent=`${students.length} حساب`;
+    $('teacherRequestsCount').textContent=`${teachers.length} حساب`;
+    $('adminUsersCount').textContent=`${admins.length} مدير`;
+
+    const renderGroup=(arr,el,type)=>{
+      if(!arr.length){el.innerHTML='<div class="admin-empty">لا توجد حسابات في هذا القسم.</div>';return;}
+      el.innerHTML=arr.map(u=>{
+        const currentSubjects=normalizeSubjects(u.subjects);
+        const requestedSubjects=normalizeSubjects(u.requestedSubjects);
+        const subjectChecks=SUBJECTS.map(([key,name])=>`<label><input type="checkbox" value="${key}" ${currentSubjects.includes(key)?'checked':''}> ${name}</label>`).join('');
+        return `<article class="admin-user-card" data-user-card="${u.uid}">
+          <div class="admin-user-top"><div><div class="admin-user-name">${escapeHtml(u.name||'بدون اسم')}</div><div class="admin-user-meta">${escapeHtml(u.email||'—')} • طلب ${accountTypeLabel(u.requestType||u.role||'student')}</div>${requestedSubjects.length?`<div class="admin-user-meta">المطلوب: ${requestedSubjects.map(s=>SUBJECT_MAP[s]).join('، ')}</div>`:''}</div></div>
+          <div class="admin-user-controls"><label>الحالة<select data-status><option value="pending">قيد الانتظار</option><option value="approved">مقبول</option><option value="rejected">مرفوض</option></select></label><label>الصلاحية<select data-role><option value="student">تلميذ</option><option value="teacher">أستاذ</option><option value="admin">مدير</option></select></label></div>
+          ${((u.role||'student')==='teacher' || (u.requestType||'')==='teacher') ? `<div class="admin-user-subjects"><strong>المواد المعتمدة للأستاذ</strong><div class="admin-subject-grid" data-subjects>${subjectChecks}</div></div>` : `<div class="admin-user-subjects" style="display:none"><div class="admin-subject-grid" data-subjects></div></div>`}
+          <div class="admin-user-actions">
+            <button type="button" class="admin-save" data-save-user>حفظ التغييرات</button>
+            ${type !== 'admins' ? `<button type="button" class="admin-delete" data-delete-user>حذف من المنصة</button>` : ''}
+          </div>
+        </article>`;
+      }).join('');
+      el.querySelectorAll('[data-user-card]').forEach(card=>{
+        const uid=card.dataset.userCard;
+        const u=arr.find(x=>x.uid===uid);
+        card.querySelector('[data-status]').value=u.status||'pending';
+        card.querySelector('[data-role]').value=u.role||'student';
+        card.querySelector('[data-save-user]').addEventListener('click',async()=>{
+          const role=card.querySelector('[data-role]').value;
+          const status=card.querySelector('[data-status]').value;
+          const subjects=[...card.querySelectorAll('[data-subjects] input:checked')].map(i=>i.value);
+          if(status==='approved' && role==='teacher' && !subjects.length){alert('الأستاذ المقبول يجب أن تكون له مادة واحدة على الأقل.');return;}
+          try{
+            await updateDoc(doc(db,'users',uid),{role,status,subjects,approvedAt:status==='approved'?serverTimestamp():null,rejectedAt:status==='rejected'?serverTimestamp():null});
+            alert(status==='approved'?'تمت الموافقة على الحساب.':status==='rejected'?'تم رفض الحساب.':'تم تحديث الحساب.');
+            await loadAdminUsers();
+          }catch(err){alert('تعذر تحديث الحساب. تأكد من قواعد Firestore.');}
+        });
+        const deleteBtn = card.querySelector('[data-delete-user]');
+        if(deleteBtn){
+          deleteBtn.addEventListener('click',()=>adminDeleteUser(uid,u));
+        }
+      });
+    };
+    renderGroup(students,lists.students,'students');
+    renderGroup(teachers,lists.teachers,'teachers');
+    renderGroup(admins,lists.admins,'admins');
+  }catch(err){
+    Object.values(lists).forEach(el=>el.innerHTML='<div class="admin-empty">تعذر تحميل المستخدمين. تأكد من صلاحيات الإدارة.</div>');
+  }
+}
+
+async function connectAuthenticatedUser(user){
+  currentUser=user;
+  if(profileUnsubscribe){profileUnsubscribe();profileUnsubscribe=null;}
+  materialCache.clear();
+  const initialSnap=await getDoc(doc(db,'users',user.uid));
+  if(!initialSnap.exists()) throw new Error('لم يتم العثور على ملف حسابك.');
+  currentProfile=initialSnap.data();
+  applyAccessState();
+  profileUnsubscribe=onSnapshot(doc(db,'users',user.uid),snap=>{
+    if(!snap.exists())return;
+    currentProfile=snap.data(); applyAccessState();
+  });
+}
+
+onAuthStateChanged(auth,async user=>{
+  if(!user){
+    currentUser=null; currentProfile=null;
+    if(profileUnsubscribe){profileUnsubscribe();profileUnsubscribe=null;}
+    materialCache.clear();
+    if(appReady){
+      document.body.classList.add('auth-required');document.body.classList.remove('approval-required');
+      $('approvalScreen').style.display='none';$('authScreen').style.display='grid';
+      showAuthChoice();
+    }
+    return;
+  }
+  try{await connectAuthenticatedUser(user);}catch(err){
+    if(appReady) $('loginError').textContent='تعذر تحميل حسابك. حاول مرة أخرى.';
+  }
+});
+
+renderSignupSubjects();
+
+setTimeout(()=>{
+  appReady=true;
+  $('splashScreen').classList.add('hide');
+  if(currentUser && currentProfile){applyAccessState();}
+  else if(!currentUser){
+    document.body.classList.add('auth-required');document.body.classList.remove('approval-required');
+    $('authScreen').style.display='grid';showAuthChoice();
+  }
+},1700);
+</script>
+
+</body>
+</html>
